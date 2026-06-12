@@ -1,0 +1,1 @@
+# softgic-centralizacion
