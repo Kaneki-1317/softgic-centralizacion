@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CentralizationApplication<centralization>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.softgic.centralization.CentralizationApplication",
+            "projectName": "centralization",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
