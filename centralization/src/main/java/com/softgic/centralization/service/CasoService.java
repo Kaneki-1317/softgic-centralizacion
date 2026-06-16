@@ -7,5 +7,5 @@ import com.softgic.centralization.dto.CasoDTO;
 
 public interface CasoService {
     List<CasoDTO> listarTodosLosCasos();
-    CasoDTO creartCaso(CasoCrearDTO casocCrearDTO);
+    CasoDTO crearCaso(CasoCrearDTO casocCrearDTO);
 }
