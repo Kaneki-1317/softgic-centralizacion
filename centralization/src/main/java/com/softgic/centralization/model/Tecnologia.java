@@ -2,6 +2,8 @@ package com.softgic.centralization.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,10 +14,12 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tecnologias")
+@JsonIgnoreProperties("casos")
 public class Tecnologia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_tecnologia")
     private Long id;
 
     @Column(unique = true, nullable = false, length = 50)

@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 public class Caso {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_caso")
     private Long id;
 
     @Column(nullable = false, length = 150)

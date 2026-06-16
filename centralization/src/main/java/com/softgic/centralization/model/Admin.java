@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_admin")
     private Long id;
 
     @Column(nullable = false, length = 100)

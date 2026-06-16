@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class CasoCrearDTO {
@@ -14,7 +15,7 @@ public class CasoCrearDTO {
     @NotBlank(message = "La descripcion no puede estar vacía")
     private String descripcion;
 
-    @NotBlank(message = "Debe seleccionar un tipo de caso")
+    @NotNull(message = "Debe seleccionar un tipo de caso")
     private Long idTipoCaso;
 
     @NotEmpty(message = "Debe seleccionar al menos una tecnología")

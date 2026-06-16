@@ -28,6 +28,38 @@ public class CasoDTO {
         this.laboratorios = laboratorios;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public String getTipoCaso() {
+        return tipoCaso;
+    }
+
+    public List<String> getTecnologias() {
+        return tecnologias;
+    }
+
+    public List<String> getCategorias() {
+        return categorias;
+    }
+
+    public List<String> getLaboratorios() {
+        return laboratorios;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
