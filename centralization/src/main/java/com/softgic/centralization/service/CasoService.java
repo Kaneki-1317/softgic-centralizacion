@@ -1,11 +1,12 @@
 package com.softgic.centralization.service;
 
-import java.util.List;
-
 import com.softgic.centralization.dto.CasoCrearDTO;
 import com.softgic.centralization.dto.CasoDTO;
+import com.softgic.centralization.dto.PaginatedCasoDTO;
 
 public interface CasoService {
-    List<CasoDTO> listarTodosLosCasos();
+    PaginatedCasoDTO listarCasosPaginados(int page, int size, String search);
     CasoDTO crearCaso(CasoCrearDTO casocCrearDTO);
+    CasoDTO actualizarCaso(Long id, CasoCrearDTO casoCrearDTO);
+    void eliminarCaso(Long id);
 }
