@@ -8,4 +8,5 @@ import com.softgic.centralization.model.Tecnologia;
 @Repository
 public interface TecnologiaRepository extends JpaRepository<Tecnologia, Long>{
 
+    boolean existsByNombreTecnologiaIgnoreCase(String nombreTecnologia);
 }

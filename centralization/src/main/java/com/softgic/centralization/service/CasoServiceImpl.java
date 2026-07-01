@@ -18,6 +18,7 @@ import com.softgic.centralization.model.Laboratorio;
 import com.softgic.centralization.model.Tecnologia;
 import com.softgic.centralization.model.TipoCaso;
 import com.softgic.centralization.repository.CasoRepository;
+import com.softgic.centralization.specification.CasoSpecification;
 import com.softgic.centralization.repository.CategoriaRepository;
 import com.softgic.centralization.repository.LaboratorioRepository;
 import com.softgic.centralization.repository.TecnologiaRepository;
@@ -43,15 +44,13 @@ public class CasoServiceImpl implements CasoService {
     }
 
     @Override
-    public PaginatedCasoDTO listarCasosPaginados(int page, int size, String search) {
+    public PaginatedCasoDTO listarCasosPaginados(int page, int size, String search,
+            String tipo, String tecnologia, String categoria, String laboratorio) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Caso> pageCasos;
-        if (search != null && !search.isBlank()) {
-            pageCasos = casoRepository.findByTituloContainingIgnoreCase(search, pageable);
-        } else {
-            pageCasos = casoRepository.findAll(pageable);
-        }
+        Page<Caso> pageCasos = casoRepository.findAll(
+                CasoSpecification.withFilters(search, tipo, tecnologia, categoria, laboratorio),
+                pageable);
 
         List<CasoDTO> content = pageCasos.getContent().stream()
                 .map(this::convertirEDto)
@@ -68,7 +67,13 @@ public class CasoServiceImpl implements CasoService {
     public CasoDTO crearCaso(CasoCrearDTO casoCrearDTO) {
         Caso nuevoCaso = new Caso();
         nuevoCaso.setTitulo(casoCrearDTO.getTitulo());
-        nuevoCaso.setDescripcion(casoCrearDTO.getDescripcion());
+        nuevoCaso.setSector(casoCrearDTO.getSector());
+        nuevoCaso.setCliente(casoCrearDTO.getCliente());
+        nuevoCaso.setAnioImplementacion(casoCrearDTO.getAnioImplementacion());
+        nuevoCaso.setBeneficioPrincipal(casoCrearDTO.getBeneficioPrincipal());
+        nuevoCaso.setReto(casoCrearDTO.getReto());
+        nuevoCaso.setResultados(casoCrearDTO.getResultados());
+        nuevoCaso.setRecursos(casoCrearDTO.getRecursos());
 
         TipoCaso tipo = tipoCasoRepository.findById(casoCrearDTO.getIdTipoCaso())
                 .orElseThrow(() -> new EntityNotFoundException("Tipo de caso no encontrado con ID: " + casoCrearDTO.getIdTipoCaso()));
@@ -94,7 +99,13 @@ public class CasoServiceImpl implements CasoService {
                 .orElseThrow(() -> new EntityNotFoundException("Caso no encontrado con ID: " + id));
 
         caso.setTitulo(casoCrearDTO.getTitulo());
-        caso.setDescripcion(casoCrearDTO.getDescripcion());
+        caso.setSector(casoCrearDTO.getSector());
+        caso.setCliente(casoCrearDTO.getCliente());
+        caso.setAnioImplementacion(casoCrearDTO.getAnioImplementacion());
+        caso.setBeneficioPrincipal(casoCrearDTO.getBeneficioPrincipal());
+        caso.setReto(casoCrearDTO.getReto());
+        caso.setResultados(casoCrearDTO.getResultados());
+        caso.setRecursos(casoCrearDTO.getRecursos());
 
         TipoCaso tipo = tipoCasoRepository.findById(casoCrearDTO.getIdTipoCaso())
                 .orElseThrow(() -> new EntityNotFoundException("Tipo de caso no encontrado con ID: " + casoCrearDTO.getIdTipoCaso()));
@@ -125,10 +136,15 @@ public class CasoServiceImpl implements CasoService {
         CasoDTO dto = new CasoDTO();
         dto.setId(caso.getId());
         dto.setTitulo(caso.getTitulo());
-        dto.setDescripcion(caso.getDescripcion());
-        dto.setFechaCreacion(caso.getFechaCreacion());
-
         dto.setTipoCaso(caso.getTipoCaso().getNombreTipo());
+        dto.setSector(caso.getSector());
+        dto.setCliente(caso.getCliente());
+        dto.setAnioImplementacion(caso.getAnioImplementacion());
+        dto.setBeneficioPrincipal(caso.getBeneficioPrincipal());
+        dto.setReto(caso.getReto());
+        dto.setResultados(caso.getResultados());
+        dto.setRecursos(caso.getRecursos());
+        dto.setFechaCreacion(caso.getFechaCreacion());
 
         dto.setTecnologias(caso.getTecnologias().stream()
                 .map(Tecnologia::getNombreTecnologia).collect(Collectors.toList()));

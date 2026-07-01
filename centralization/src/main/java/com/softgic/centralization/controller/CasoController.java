@@ -3,7 +3,6 @@ package com.softgic.centralization.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,8 +21,7 @@ import com.softgic.centralization.service.CasoService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/casos")
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/v1/casos")
 @Validated
 public class CasoController {
 
@@ -37,8 +35,13 @@ public class CasoController {
     public ResponseEntity<PaginatedCasoDTO> obtenerCasosPaginados(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "") String search) {
-        return ResponseEntity.ok(casoService.listarCasosPaginados(page, size, search));
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String tecnologia,
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String laboratorio) {
+        return ResponseEntity.ok(
+            casoService.listarCasosPaginados(page, size, search, tipo, tecnologia, categoria, laboratorio));
     }
 
     @PostMapping

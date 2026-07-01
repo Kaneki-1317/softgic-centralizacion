@@ -3,7 +3,13 @@ package com.softgic.centralization.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.softgic.centralization.dto.RecursoDTO;
+import com.softgic.centralization.util.RecursoListConverter;
+
+import org.hibernate.annotations.BatchSize;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,8 +31,29 @@ public class Caso {
     @Column(nullable = false, length = 150)
     private String titulo;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String descripcion;
+    // Renombrado en Java; columna BD sigue siendo "descripcion"
+    @Column(name = "descripcion", columnDefinition = "TEXT", nullable = false)
+    private String reto;
+
+    // Renombrado en Java; columna BD sigue siendo "impacto"
+    @Column(name = "impacto", columnDefinition = "TEXT")
+    private String resultados;
+
+    @Column(nullable = false, length = 100)
+    private String sector;
+
+    @Column(length = 150)
+    private String cliente;
+
+    @Column(nullable = false)
+    private Integer anioImplementacion;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String beneficioPrincipal;
+
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = RecursoListConverter.class)
+    private List<RecursoDTO> recursos;
 
     @Column(name = "Fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
@@ -35,6 +62,7 @@ public class Caso {
     @JoinColumn(name = "id_tipo", nullable = false)
     private TipoCaso tipoCaso;
 
+    @BatchSize(size = 50)
     @ManyToMany
     @JoinTable(
         name = "caso_tecnologia",
@@ -43,6 +71,7 @@ public class Caso {
     )
     private List<Tecnologia> tecnologias;
 
+    @BatchSize(size = 50)
     @ManyToMany
     @JoinTable(
         name = "caso_categoria",
@@ -51,6 +80,7 @@ public class Caso {
     )
     private List<Categoria> categorias;
 
+    @BatchSize(size = 50)
     @ManyToMany
     @JoinTable(
         name = "caso_laboratorio",
@@ -59,84 +89,47 @@ public class Caso {
     )
     private List<Laboratorio> laboratorios;
 
-    public Caso() {
-    }
+    public Caso() {}
 
-    public Caso(Long id, String titulo, String descripcion, LocalDateTime fechaCreacion, TipoCaso tipoCaso,
-            List<Tecnologia> tecnologias, List<Categoria> categorias, List<Laboratorio> laboratorios) {
-        this.id = id;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.fechaCreacion = fechaCreacion;
-        this.tipoCaso = tipoCaso;
-        this.tecnologias = tecnologias;
-        this.categorias = categorias;
-        this.laboratorios = laboratorios;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Long getId() {
-        return id;
-    }
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getReto() { return reto; }
+    public void setReto(String reto) { this.reto = reto; }
 
-    public String getTitulo() {
-        return titulo;
-    }
+    public String getResultados() { return resultados; }
+    public void setResultados(String resultados) { this.resultados = resultados; }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
+    public String getSector() { return sector; }
+    public void setSector(String sector) { this.sector = sector; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public String getCliente() { return cliente; }
+    public void setCliente(String cliente) { this.cliente = cliente; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public Integer getAnioImplementacion() { return anioImplementacion; }
+    public void setAnioImplementacion(Integer anioImplementacion) { this.anioImplementacion = anioImplementacion; }
 
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
+    public String getBeneficioPrincipal() { return beneficioPrincipal; }
+    public void setBeneficioPrincipal(String beneficioPrincipal) { this.beneficioPrincipal = beneficioPrincipal; }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
+    public List<RecursoDTO> getRecursos() { return recursos; }
+    public void setRecursos(List<RecursoDTO> recursos) { this.recursos = recursos; }
 
-    public TipoCaso getTipoCaso() {
-        return tipoCaso;
-    }
+    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
 
-    public void setTipoCaso(TipoCaso tipoCaso) {
-        this.tipoCaso = tipoCaso;
-    }
+    public TipoCaso getTipoCaso() { return tipoCaso; }
+    public void setTipoCaso(TipoCaso tipoCaso) { this.tipoCaso = tipoCaso; }
 
-    public List<Tecnologia> getTecnologias() {
-        return tecnologias;
-    }
+    public List<Tecnologia> getTecnologias() { return tecnologias; }
+    public void setTecnologias(List<Tecnologia> tecnologias) { this.tecnologias = tecnologias; }
 
-    public void setTecnologias(List<Tecnologia> tecnologias) {
-        this.tecnologias = tecnologias;
-    }
+    public List<Categoria> getCategorias() { return categorias; }
+    public void setCategorias(List<Categoria> categorias) { this.categorias = categorias; }
 
-    public List<Categoria> getCategorias() {
-        return categorias;
-    }
-
-    public void setCategorias(List<Categoria> categorias) {
-        this.categorias = categorias;
-    }
-
-    public List<Laboratorio> getLaboratorios() {
-        return laboratorios;
-    }
-
-    public void setLaboratorios(List<Laboratorio> laboratorios) {
-        this.laboratorios = laboratorios;
-    }
-
-    
+    public List<Laboratorio> getLaboratorios() { return laboratorios; }
+    public void setLaboratorios(List<Laboratorio> laboratorios) { this.laboratorios = laboratorios; }
 }

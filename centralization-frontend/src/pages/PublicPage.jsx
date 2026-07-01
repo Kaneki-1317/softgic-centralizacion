@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { SearchX } from "lucide-react";
 
 import PublicNavbar from "../components/Navbar/PublicNavbar";
 import FilterPanel from "../components/Filters/FilterPanel";
 import CaseCard from "../components/Cases/CaseCard";
 import CaseDetailModal from "../components/Cases/CaseDetailModal";
 import CaseSkeletons from "../components/Cases/CaseSkeletons";
+import Footer from "../components/Shared/Footer";
 
 import { useToast } from "../context/ToastContext";
 import api from "../services/api";
@@ -15,47 +17,43 @@ export default function PublicPage() {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCase, setSelectedCase] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [metadata, setMetadata] = useState({
-    tipos: [],
-    tecnologias: [],
-    categorias: [],
-    laboratorios: [],
+    tipos: [], tecnologias: [], categorias: [], laboratorios: [],
   });
 
   const [pagination, setPagination] = useState({
-    paginaActual: 0,
-    totalPaginas: 0,
-    totalElementos: 0,
+    paginaActual: 0, totalPaginas: 0, totalElementos: 0,
   });
 
-  // Texto actualmente en el input (controlado)
   const [searchInput, setSearchInput] = useState("");
-  // Último texto enviado al backend (para mantenerlo al cambiar de página)
   const [submittedSearch, setSubmittedSearch] = useState("");
 
   const [filters, setFilters] = useState({
-    tipo: "",
-    tecnologia: "",
-    categoria: "",
-    laboratorio: "",
+    tipo: "", tecnologia: "", categoria: "", laboratorio: "",
   });
 
   useEffect(() => {
-    loadCases(0, "");
+    loadCases(0, "", { tipo: "", tecnologia: "", categoria: "", laboratorio: "" });
     loadMetadata();
   }, []);
 
-  async function loadCases(page, search) {
+  async function loadCases(page, search, activeFilters) {
     try {
       setLoading(true);
-      const response = await api.get("/casos", {
-        params: { page, size: 10, search },
-      });
+      const params = { page, size: 10 };
+      if (search) params.search = search;
+      if (activeFilters.tipo)        params.tipo        = activeFilters.tipo;
+      if (activeFilters.tecnologia)  params.tecnologia  = activeFilters.tecnologia;
+      if (activeFilters.categoria)   params.categoria   = activeFilters.categoria;
+      if (activeFilters.laboratorio) params.laboratorio = activeFilters.laboratorio;
+
+      const response = await api.get("/casos", { params });
       setCases(response.data.content);
       setPagination({
-        paginaActual: response.data.paginaActual,
-        totalPaginas: response.data.totalPaginas,
+        paginaActual:   response.data.paginaActual,
+        totalPaginas:   response.data.totalPaginas,
         totalElementos: response.data.totalElementos,
       });
     } catch (error) {
@@ -88,69 +86,88 @@ export default function PublicPage() {
 
   function handleSearchSubmit() {
     setSubmittedSearch(searchInput);
-    loadCases(0, searchInput);
+    loadCases(0, searchInput, filters);
+  }
+
+  function handleFilterChange(newFilters) {
+    setFilters(newFilters);
+    loadCases(0, submittedSearch, newFilters);
   }
 
   function handlePageChange(newPage) {
-    loadCases(newPage, submittedSearch);
+    loadCases(newPage, submittedSearch, filters);
   }
 
   function handleClear() {
+    const empty = { tipo: "", tecnologia: "", categoria: "", laboratorio: "" };
     setSearchInput("");
     setSubmittedSearch("");
-    setFilters({ tipo: "", tecnologia: "", categoria: "", laboratorio: "" });
-    loadCases(0, "");
+    setFilters(empty);
+    loadCases(0, "", empty);
   }
 
-  const filteredCases = useMemo(() => {
-    return cases.filter((item) => {
-      const matchesTipo =
-        !filters.tipo || item.tipoCaso === filters.tipo;
-
-      const matchesTecnologia =
-        !filters.tecnologia || item.tecnologias?.includes(filters.tecnologia);
-
-      const matchesCategoria =
-        !filters.categoria || item.categorias?.includes(filters.categoria);
-
-      const matchesLaboratorio =
-        !filters.laboratorio || item.laboratorios?.includes(filters.laboratorio);
-
-      return matchesTipo && matchesTecnologia && matchesCategoria && matchesLaboratorio;
-    });
-  }, [cases, filters]);
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   return (
     <>
       <PublicNavbar />
 
-      <main className="public-layout">
+      <main className="public-layout" id="casos">
 
-        <aside>
-          <FilterPanel
-            search={searchInput}
-            onSearchChange={setSearchInput}
-            onSearchSubmit={handleSearchSubmit}
-            filters={filters}
-            metadata={metadata}
-            onChange={setFilters}
-            onClear={handleClear}
-          />
-        </aside>
+        <div className="search-topbar">
+          <button className="filter-toggle" onClick={() => setDrawerOpen(true)}>
+            <span className="hamburger-icon">&#9776;</span> Filtrar
+            {activeFilterCount > 0 && (
+              <span className="filter-badge">{activeFilterCount}</span>
+            )}
+          </button>
+          <div className="search-right">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Buscar por palabras clave..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
+            />
+            <button className="search-btn" onClick={handleSearchSubmit}>Buscar</button>
+          </div>
+        </div>
+
+        <FilterPanel
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          filters={filters}
+          metadata={metadata}
+          onChange={handleFilterChange}
+          onClear={handleClear}
+        />
+
+        {!loading && (
+          <p className="results-counter">
+            {pagination.totalElementos} caso{pagination.totalElementos !== 1 ? "s" : ""} encontrado{pagination.totalElementos !== 1 ? "s" : ""}
+          </p>
+        )}
 
         <section className="case-feed">
-
           {loading && <CaseSkeletons />}
 
-          {!loading && (
+          {!loading && cases.length === 0 && (
+            <div className="empty-state">
+              <SearchX size={52} strokeWidth={1.3} />
+              <h3>Sin resultados</h3>
+              <p>No encontramos casos que coincidan con tu búsqueda o filtros aplicados.</p>
+              <button className="ghost-button" onClick={handleClear}>
+                Limpiar búsqueda
+              </button>
+            </div>
+          )}
+
+          {!loading && cases.length > 0 && (
             <>
               <div className="case-grid">
-                {filteredCases.map((item) => (
-                  <CaseCard
-                    key={item.id}
-                    item={item}
-                    onOpen={() => setSelectedCase(item)}
-                  />
+                {cases.map((item) => (
+                  <CaseCard key={item.id} item={item} onOpen={() => setSelectedCase(item)} />
                 ))}
               </div>
 
@@ -163,11 +180,9 @@ export default function PublicPage() {
                   >
                     Anterior
                   </button>
-
                   <span className="pagination-info">
                     Página {pagination.paginaActual + 1} de {pagination.totalPaginas}
                   </span>
-
                   <button
                     className="ghost-button"
                     onClick={() => handlePageChange(pagination.paginaActual + 1)}
@@ -179,15 +194,13 @@ export default function PublicPage() {
               )}
             </>
           )}
-
         </section>
 
       </main>
 
-      <CaseDetailModal
-        item={selectedCase}
-        onClose={() => setSelectedCase(null)}
-      />
+      <Footer />
+
+      <CaseDetailModal item={selectedCase} onClose={() => setSelectedCase(null)} />
     </>
   );
 }

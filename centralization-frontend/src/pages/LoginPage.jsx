@@ -1,104 +1,101 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Mail, Lock, LogIn } from "lucide-react";
 
-import {
-  useAuth,
-} from "../context/AuthContext";
-
+import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import brandSoftgic from "../assets/Softgic_Logo_White-scaled.png";
 
 export default function LoginPage() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { showToast } = useToast();
 
-  const { login } =
-    useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { showToast } =
-    useToast();
-
-  const [email, setEmail] =
-    useState("");
-
-  const [password,
-    setPassword] =
-    useState("");
-
-  const [error, setError] =
-    useState("");
-
-  async function handleSubmit(
-    e
-  ) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
+    setError("");
 
-    const success =
-      await login(
-        email,
-        password
-      );
+    const adminName = await login(email, password);
 
-    if (success) {
+    if (adminName) {
       showToast("Sesión iniciada correctamente", "success");
-      navigate("/admin");
+      navigate(`/softgic-access-portal/${encodeURIComponent(adminName)}`);
       return;
     }
 
+    setError("Correo o contraseña incorrectos.");
     showToast("Credenciales inválidas", "error");
-    setError(
-      "Credenciales inválidas"
-    );
+    setLoading(false);
   }
 
   return (
     <main className="login-page">
 
-      <form
-        className="login-card"
-        onSubmit={
-          handleSubmit
-        }
-      >
-        <h1>
-          Iniciar Sesión
-        </h1>
+      {/* Panel izquierdo — marca */}
+      <div className="login-brand">
+        <img src={brandSoftgic} alt="Softgic" width={200} />
+        <div className="login-brand-text">
+          <h2>Portal Administrativo</h2>
+          <p>Gestiona los casos de uso y éxito de Softgic desde un solo lugar.</p>
+        </div>
+      </div>
 
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) =>
-            setEmail(
-              e.target.value
-            )
-          }
-        />
+      {/* Panel derecho — formulario */}
+      <div className="login-form-side">
+        <form className="login-card" onSubmit={handleSubmit}>
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
-          }
-        />
+          <div className="login-card-header">
+            <h1>Iniciar sesión</h1>
+            <p>Ingresa tus credenciales para continuar</p>
+          </div>
 
-        {error && (
-          <p className="error">
-            {error}
-          </p>
-        )}
+          <div className="login-fields">
+            <div className="login-field">
+              <label>Correo electrónico</label>
+              <div className="login-input-wrap">
+                <Mail size={16} className="login-input-icon" />
+                <input
+                  type="email"
+                  placeholder="admin@softgic.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
 
-        <button
-          className="primary-button"
-          type="submit"
-        >
-          Ingresar
-        </button>
+            <div className="login-field">
+              <label>Contraseña</label>
+              <div className="login-input-wrap">
+                <Lock size={16} className="login-input-icon" />
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          </div>
 
-      </form>
+          {error && (
+            <div className="login-error">{error}</div>
+          )}
+
+          <button className="login-submit" type="submit" disabled={loading}>
+            <LogIn size={16} />
+            {loading ? "Ingresando..." : "Ingresar"}
+          </button>
+
+        </form>
+      </div>
 
     </main>
   );

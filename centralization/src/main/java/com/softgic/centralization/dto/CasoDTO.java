@@ -6,89 +6,60 @@ import java.util.List;
 public class CasoDTO {
     private Long id;
     private String titulo;
-    private String descripcion;
-    private LocalDateTime fechaCreacion;
     private String tipoCaso;
+    private String sector;
+    private String cliente;
+    private Integer anioImplementacion;
+    private String beneficioPrincipal;
+    private String reto;
+    private String resultados;
+    private List<RecursoDTO> recursos;
+    private LocalDateTime fechaCreacion;
     private List<String> tecnologias;
     private List<String> categorias;
     private List<String> laboratorios;
-    
-    public CasoDTO() {
-    }
 
-    public CasoDTO(Long id, String titulo, String descripcion, LocalDateTime fechaCreacion, String tipoCaso,
-            List<String> tecnologias, List<String> categorias, List<String> laboratorios) {
-        this.id = id;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.fechaCreacion = fechaCreacion;
-        this.tipoCaso = tipoCaso;
-        this.tecnologias = tecnologias;
-        this.categorias = categorias;
-        this.laboratorios = laboratorios;
-    }
+    public CasoDTO() {}
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getTitulo() {
-        return titulo;
-    }
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public String getTipoCaso() { return tipoCaso; }
+    public void setTipoCaso(String tipoCaso) { this.tipoCaso = tipoCaso; }
 
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
+    public String getSector() { return sector; }
+    public void setSector(String sector) { this.sector = sector; }
 
-    public String getTipoCaso() {
-        return tipoCaso;
-    }
+    public String getCliente() { return cliente; }
+    public void setCliente(String cliente) { this.cliente = cliente; }
 
-    public List<String> getTecnologias() {
-        return tecnologias;
-    }
+    public Integer getAnioImplementacion() { return anioImplementacion; }
+    public void setAnioImplementacion(Integer anioImplementacion) { this.anioImplementacion = anioImplementacion; }
 
-    public List<String> getCategorias() {
-        return categorias;
-    }
+    public String getBeneficioPrincipal() { return beneficioPrincipal; }
+    public void setBeneficioPrincipal(String beneficioPrincipal) { this.beneficioPrincipal = beneficioPrincipal; }
 
-    public List<String> getLaboratorios() {
-        return laboratorios;
-    }
+    public String getReto() { return reto; }
+    public void setReto(String reto) { this.reto = reto; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getResultados() { return resultados; }
+    public void setResultados(String resultados) { this.resultados = resultados; }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
+    public List<RecursoDTO> getRecursos() { return recursos; }
+    public void setRecursos(List<RecursoDTO> recursos) { this.recursos = recursos; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
 
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
+    public List<String> getTecnologias() { return tecnologias; }
+    public void setTecnologias(List<String> tecnologias) { this.tecnologias = tecnologias; }
 
-    public void setTipoCaso(String tipoCaso) {
-        this.tipoCaso = tipoCaso;
-    }
+    public List<String> getCategorias() { return categorias; }
+    public void setCategorias(List<String> categorias) { this.categorias = categorias; }
 
-    public void setTecnologias(List<String> tecnologias) {
-        this.tecnologias = tecnologias;
-    }
-
-    public void setCategorias(List<String> categorias) {
-        this.categorias = categorias;
-    }
-
-    public void setLaboratorios(List<String> laboratorios) {
-        this.laboratorios = laboratorios;
-    }
+    public List<String> getLaboratorios() { return laboratorios; }
+    public void setLaboratorios(List<String> laboratorios) { this.laboratorios = laboratorios; }
 }

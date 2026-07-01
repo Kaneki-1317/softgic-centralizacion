@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Configuración local con credenciales — NO commitear ###
+src/main/resources/application-dev.properties

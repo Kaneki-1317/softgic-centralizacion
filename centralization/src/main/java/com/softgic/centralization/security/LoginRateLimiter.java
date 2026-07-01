@@ -1,0 +1,46 @@
+package com.softgic.centralization.security;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class LoginRateLimiter {
+
+    private static final int MAX_ATTEMPTS = 5;
+    private static final long BLOCK_DURATION_MS = 15 * 60 * 1000L; // 15 minutos
+
+    private final ConcurrentHashMap<String, AtomicInteger> failedAttempts = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Long> blockedUntil = new ConcurrentHashMap<>();
+
+    public boolean isBlocked(String key) {
+        Long until = blockedUntil.get(key);
+        if (until == null) return false;
+        if (System.currentTimeMillis() < until) return true;
+        // El bloqueo venció — limpiar estado
+        blockedUntil.remove(key);
+        failedAttempts.remove(key);
+        return false;
+    }
+
+    public void recordFailure(String key) {
+        int attempts = failedAttempts
+                .computeIfAbsent(key, k -> new AtomicInteger(0))
+                .incrementAndGet();
+        if (attempts >= MAX_ATTEMPTS) {
+            blockedUntil.put(key, System.currentTimeMillis() + BLOCK_DURATION_MS);
+        }
+    }
+
+    public void recordSuccess(String key) {
+        failedAttempts.remove(key);
+        blockedUntil.remove(key);
+    }
+
+    public int getRemainingAttempts(String key) {
+        AtomicInteger counter = failedAttempts.get(key);
+        if (counter == null) return MAX_ATTEMPTS;
+        return Math.max(0, MAX_ATTEMPTS - counter.get());
+    }
+}

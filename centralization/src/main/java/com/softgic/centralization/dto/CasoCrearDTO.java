@@ -8,12 +8,28 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class CasoCrearDTO {
+
     @NotBlank(message = "El titulo no puede estar vacío")
     @Size(max = 150, message = "El titulo no puede superar los 150 caracteres")
     private String titulo;
 
-    @NotBlank(message = "La descripcion no puede estar vacía")
-    private String descripcion;
+    @NotBlank(message = "El tipo de caso no puede estar vacío")
+    @Size(max = 100)
+    private String sector;
+
+    private String cliente;
+
+    private Integer anioImplementacion;
+
+    @NotBlank(message = "El beneficio principal no puede estar vacío")
+    private String beneficioPrincipal;
+
+    @NotBlank(message = "El reto no puede estar vacío")
+    private String reto;
+
+    private String resultados;
+
+    private List<RecursoDTO> recursos;
 
     @NotNull(message = "Debe seleccionar un tipo de caso")
     private Long idTipoCaso;
@@ -27,71 +43,41 @@ public class CasoCrearDTO {
     @NotEmpty(message = "Debe seleccionar al menos un laboratorio")
     private List<Long> idsLaboratorios;
 
-    public CasoCrearDTO() {
-    }
+    public CasoCrearDTO() {}
 
-    public CasoCrearDTO(
-            @NotBlank(message = "El titulo no puede estar vacío") @Size(max = 150, message = "El titulo no puede superar los 150 caracteres") String titulo,
-            @NotBlank(message = "La descripcion no puede estar vacía") String descripcion,
-            @NotBlank(message = "Debe seleccionar un tipo de caso") Long idTipoCaso,
-            @NotEmpty(message = "Debe seleccionar al menos una tecnología") List<Long> idsTecnologias,
-            @NotEmpty(message = "Debe seleccionar al menos una categoría") List<Long> idsCategorias,
-            @NotEmpty(message = "Debe seleccionar al menos un laboratorio") List<Long> idsLaboratorios) {
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.idTipoCaso = idTipoCaso;
-        this.idsTecnologias = idsTecnologias;
-        this.idsCategorias = idsCategorias;
-        this.idsLaboratorios = idsLaboratorios;
-    }
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public String getTitulo() {
-        return titulo;
-    }
+    public String getSector() { return sector; }
+    public void setSector(String sector) { this.sector = sector; }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
+    public String getCliente() { return cliente; }
+    public void setCliente(String cliente) { this.cliente = cliente; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public Integer getAnioImplementacion() { return anioImplementacion; }
+    public void setAnioImplementacion(Integer anioImplementacion) { this.anioImplementacion = anioImplementacion; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public String getBeneficioPrincipal() { return beneficioPrincipal; }
+    public void setBeneficioPrincipal(String beneficioPrincipal) { this.beneficioPrincipal = beneficioPrincipal; }
 
-    public Long getIdTipoCaso() {
-        return idTipoCaso;
-    }
+    public String getReto() { return reto; }
+    public void setReto(String reto) { this.reto = reto; }
 
-    public void setIdTipoCaso(Long idTipoCaso) {
-        this.idTipoCaso = idTipoCaso;
-    }
+    public String getResultados() { return resultados; }
+    public void setResultados(String resultados) { this.resultados = resultados; }
 
-    public List<Long> getIdsTecnologias() {
-        return idsTecnologias;
-    }
+    public List<RecursoDTO> getRecursos() { return recursos; }
+    public void setRecursos(List<RecursoDTO> recursos) { this.recursos = recursos; }
 
-    public void setIdsTecnologias(List<Long> idsTecnologias) {
-        this.idsTecnologias = idsTecnologias;
-    }
+    public Long getIdTipoCaso() { return idTipoCaso; }
+    public void setIdTipoCaso(Long idTipoCaso) { this.idTipoCaso = idTipoCaso; }
 
-    public List<Long> getIdsCategorias() {
-        return idsCategorias;
-    }
+    public List<Long> getIdsTecnologias() { return idsTecnologias; }
+    public void setIdsTecnologias(List<Long> idsTecnologias) { this.idsTecnologias = idsTecnologias; }
 
-    public void setIdsCategorias(List<Long> idsCategorias) {
-        this.idsCategorias = idsCategorias;
-    }
+    public List<Long> getIdsCategorias() { return idsCategorias; }
+    public void setIdsCategorias(List<Long> idsCategorias) { this.idsCategorias = idsCategorias; }
 
-    public List<Long> getIdsLaboratorios() {
-        return idsLaboratorios;
-    }
-
-    public void setIdsLaboratorios(List<Long> idsLaboratorios) {
-        this.idsLaboratorios = idsLaboratorios;
-    }
-
-    
+    public List<Long> getIdsLaboratorios() { return idsLaboratorios; }
+    public void setIdsLaboratorios(List<Long> idsLaboratorios) { this.idsLaboratorios = idsLaboratorios; }
 }

@@ -25,10 +25,15 @@ function isTokenValid(token) {
   return payload.exp * 1000 > Date.now();
 }
 
+function getNameFromToken(token) {
+  const payload = parseJwt(token);
+  return payload?.name ?? null;
+}
+
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    isTokenValid(localStorage.getItem("token"))
-  );
+  const storedToken = localStorage.getItem("token");
+  const [isAuthenticated, setIsAuthenticated] = useState(isTokenValid(storedToken));
+  const [adminName, setAdminName] = useState(getNameFromToken(storedToken));
 
   async function login(email, password) {
     try {
@@ -39,20 +44,23 @@ export function AuthProvider({ children }) {
 
       const token = response.data.token;
       localStorage.setItem("token", token);
+      const name = getNameFromToken(token);
+      setAdminName(name);
       setIsAuthenticated(true);
-      return true;
+      return name;
     } catch {
-      return false;
+      return null;
     }
   }
 
   function logout() {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
+    setAdminName(null);
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, adminName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

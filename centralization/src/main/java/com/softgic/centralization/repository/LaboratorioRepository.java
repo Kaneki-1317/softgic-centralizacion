@@ -7,4 +7,5 @@ import com.softgic.centralization.model.Laboratorio;
 @Repository
 public interface LaboratorioRepository extends JpaRepository<Laboratorio, Long>{
 
+    boolean existsByNombreLaboratorioIgnoreCase(String nombreLaboratorio);
 }

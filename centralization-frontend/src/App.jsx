@@ -14,16 +14,14 @@ import {
 
 import ToastViewport from "./components/Shared/ToastViewport";
 
-function PrivateRoute({
-  children,
-}) {
-  const {
-    isAuthenticated,
-  } = useAuth();
+function PrivateRoute({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/softgic-access-portal/login" />;
+}
 
-  return isAuthenticated
-    ? children
-    : <Navigate to="/login" />;
+function GuestRoute({ children }) {
+  const { isAuthenticated, adminName } = useAuth();
+  return isAuthenticated ? <Navigate to={`/softgic-access-portal/${encodeURIComponent(adminName)}`} /> : children;
 }
 
 export default function App() {
@@ -39,12 +37,16 @@ export default function App() {
         />
 
         <Route
-          path="/login"
-          element={<LoginPage />}
+          path="/softgic-access-portal/login"
+          element={
+            <GuestRoute>
+              <LoginPage />
+            </GuestRoute>
+          }
         />
 
         <Route
-          path="/admin"
+          path="/softgic-access-portal/:adminName"
           element={
             <PrivateRoute>
               <AdminPage />

@@ -5,7 +5,8 @@ import com.softgic.centralization.dto.CasoDTO;
 import com.softgic.centralization.dto.PaginatedCasoDTO;
 
 public interface CasoService {
-    PaginatedCasoDTO listarCasosPaginados(int page, int size, String search);
+    PaginatedCasoDTO listarCasosPaginados(int page, int size, String search,
+        String tipo, String tecnologia, String categoria, String laboratorio);
     CasoDTO crearCaso(CasoCrearDTO casocCrearDTO);
     CasoDTO actualizarCaso(Long id, CasoCrearDTO casoCrearDTO);
     void eliminarCaso(Long id);

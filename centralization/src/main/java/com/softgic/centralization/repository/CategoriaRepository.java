@@ -8,4 +8,5 @@ import com.softgic.centralization.model.Categoria;
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Long>{
 
+    boolean existsByNombreCategoriaIgnoreCase(String nombreCategoria);
 }
