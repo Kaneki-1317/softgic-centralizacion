@@ -67,9 +67,36 @@ const LIST_FIELDS = {
   laboratorio: "idsLaboratorios",
 };
 
+// Resuelve la forma "externa" (nombre de tipo + labels de tecnologías/
+// categorías/laboratorios) hacia la forma interna del formulario (IDs).
+// La usan tanto initialData (edición) como prefillData (creación desde
+// documento) — misma lógica, misma resolución, para no duplicarla.
+function buildFormFromExternalShape(source, tiposCasos, tecnologias, categorias, laboratorios) {
+  const tipoId = tiposCasos.find((t) => t.nombreTipo === source.tipoCaso)?.id ?? "";
+  const tecIds = tecnologias.filter((t) => source.tecnologias?.includes(t.label)).map((t) => t.id);
+  const catIds = categorias.filter((c) => source.categorias?.includes(c.label)).map((c) => c.id);
+  const labIds = laboratorios.filter((l) => source.laboratorios?.includes(l.label)).map((l) => l.id);
+
+  return {
+    titulo:             source.titulo ?? "",
+    sector:             source.sector ?? "",
+    cliente:            source.cliente ?? "",
+    anioImplementacion: source.anioImplementacion ?? "",
+    beneficioPrincipal: source.beneficioPrincipal ?? "",
+    reto:               source.reto ?? "",
+    resultados:         source.resultados ?? "",
+    recursos:           (source.recursos || []).map((r) => ({ tipo: r.tipo ?? "PDF", nombre: r.nombre ?? "", url: r.url ?? "" })),
+    idTipoCaso:         tipoId,
+    idsTecnologias:     tecIds,
+    idsCategorias:      catIds,
+    idsLaboratorios:    labIds,
+  };
+}
+
 export default function CaseFormModal({
   open,
   initialData,
+  prefillData = null,
   onClose,
   onSave,
   tiposCasos = [],
@@ -103,40 +130,26 @@ export default function CaseFormModal({
   useEffect(() => { setLocalCats(categorias);  }, [categorias]);
   useEffect(() => { setLocalLabs(laboratorios); }, [laboratorios]);
 
-  // Populate form when modal opens or edited case changes.
+  // Populate form when modal opens, edited case changes, or prefill data (from
+  // the "Crear desde Documento" flow) arrives. initialData takes precedence
+  // over prefillData; when neither is present, falls back to EMPTY_FORM.
   // Intentionally omits tecnologias/categorias/laboratorios from deps to prevent
   // resetting the form while the user is quick-creating inside this modal.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!open) return;
 
-    if (!initialData) {
+    const source = initialData || prefillData;
+
+    if (!source) {
       setForm(EMPTY_FORM);
       setDeleteMode({ tecnologia: false, categoria: false, laboratorio: false });
       return;
     }
 
-    const tipoId = tiposCasos.find((t) => t.nombreTipo === initialData.tipoCaso)?.id ?? "";
-    const tecIds = tecnologias.filter((t) => initialData.tecnologias?.includes(t.label)).map((t) => t.id);
-    const catIds = categorias.filter((c) => initialData.categorias?.includes(c.label)).map((c) => c.id);
-    const labIds = laboratorios.filter((l) => initialData.laboratorios?.includes(l.label)).map((l) => l.id);
-
-    setForm({
-      titulo:             initialData.titulo ?? "",
-      sector:             initialData.sector ?? "",
-      cliente:            initialData.cliente ?? "",
-      anioImplementacion: initialData.anioImplementacion ?? "",
-      beneficioPrincipal: initialData.beneficioPrincipal ?? "",
-      reto:               initialData.reto ?? "",
-      resultados:         initialData.resultados ?? "",
-      recursos:           (initialData.recursos || []).map((r) => ({ tipo: r.tipo ?? "PDF", nombre: r.nombre ?? "", url: r.url ?? "" })),
-      idTipoCaso:         tipoId,
-      idsTecnologias:     tecIds,
-      idsCategorias:      catIds,
-      idsLaboratorios:    labIds,
-    });
+    setForm(buildFormFromExternalShape(source, tiposCasos, tecnologias, categorias, laboratorios));
     setDeleteMode({ tecnologia: false, categoria: false, laboratorio: false });
-  }, [open, initialData]);
+  }, [open, initialData, prefillData]);
 
   if (!open) return null;
 

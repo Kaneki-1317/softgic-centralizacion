@@ -7,6 +7,7 @@ import FilterPanel from "../components/Filters/FilterPanel";
 import AdminCaseCard from "../components/Admin/AdminCaseCard";
 import CaseDetailModal from "../components/Cases/CaseDetailModal";
 import CaseFormModal from "../components/Admin/CaseFormModal";
+import NewCaseWizard from "../components/Admin/NewCaseWizard";
 import CaseSkeletons from "../components/Cases/CaseSkeletons";
 import ConfirmModal from "../components/Shared/ConfirmModal";
 
@@ -26,6 +27,8 @@ export default function AdminPage() {
   const [openModal, setOpenModal] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [prefillData, setPrefillData] = useState(null);
 
   const [metadata, setMetadata] = useState({
     tipos: [],
@@ -113,11 +116,29 @@ export default function AdminPage() {
       }
       setOpenModal(false);
       setEditingCase(null);
+      setPrefillData(null);
       loadCases(pagination.paginaActual, submittedSearch, filters);
     } catch (error) {
       console.error(error);
       showToast(isEditing ? "Error al actualizar" : "Error al crear", "error");
     }
+  }
+
+  function handleChooseManual() {
+    setWizardOpen(false);
+    setEditingCase(null);
+    setOpenModal(true);
+  }
+
+  function handleWizardComplete(data) {
+    setWizardOpen(false);
+    setPrefillData(data);
+    setEditingCase(null);
+    setOpenModal(true);
+  }
+
+  function handleWizardClose() {
+    setWizardOpen(false);
   }
 
   function handleMetadataCreated(type, newItem) {
@@ -194,7 +215,7 @@ export default function AdminPage() {
           <div className="admin-toolbar-actions">
             <button
               className="primary-button"
-              onClick={() => { setEditingCase(null); setOpenModal(true); }}
+              onClick={() => setWizardOpen(true)}
             >
               + Nuevo Caso
             </button>
@@ -308,10 +329,19 @@ export default function AdminPage() {
         onClose={() => setSelectedCase(null)}
       />
 
+      {wizardOpen && (
+        <NewCaseWizard
+          onClose={handleWizardClose}
+          onChooseManual={handleChooseManual}
+          onComplete={handleWizardComplete}
+        />
+      )}
+
       <CaseFormModal
         open={openModal}
         initialData={editingCase}
-        onClose={() => { setOpenModal(false); setEditingCase(null); }}
+        prefillData={prefillData}
+        onClose={() => { setOpenModal(false); setEditingCase(null); setPrefillData(null); }}
         onSave={saveCase}
         tiposCasos={metadata.tiposCasos}
         tecnologias={metadata.tecnologias}

@@ -2153,3 +2153,277 @@ body::-webkit-scrollbar-corner,
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   Wizard "Crear desde Documento"
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* .primary-button no tenía tratamiento visual para :disabled (el botón
+   "Analizar Documento" lo necesita mientras no hay archivos válidos). */
+.primary-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Paso 1: elección de método ── */
+.method-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.method-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ffffff;
+  border: 1.5px solid #dde1ea;
+  border-radius: 16px;
+  padding: 22px 20px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  font-family: 'Segoe UI', Inter, sans-serif;
+}
+
+.method-choice-card:hover {
+  border-color: #008AAB;
+  background: #e8f6f9;
+  transform: translateY(-2px);
+}
+
+.method-choice-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #e8f6f9;
+  color: #008AAB;
+}
+
+.method-choice-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.method-choice-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .method-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Paso 2: subida de documentos ── */
+.upload-step-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.upload-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  border: 1.5px dashed #c8d0dc;
+  border-radius: 14px;
+  padding: 36px 20px;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.drag-active {
+  border-color: #008AAB;
+  background: #e8f6f9;
+}
+
+.upload-dropzone-icon {
+  color: #008AAB;
+}
+
+.upload-dropzone-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.upload-dropzone-hint {
+  font-size: 12px;
+  color: #999;
+}
+
+.upload-input-hidden {
+  display: none;
+}
+
+.upload-file-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-file-row {
+  display: grid;
+  grid-template-columns: 2fr 0.8fr 0.7fr 1.2fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e6f0;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 13px;
+}
+
+.upload-file-row-header {
+  border: none;
+  background: none;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #999;
+}
+
+.upload-file-row.status-error {
+  border-color: #f7c1bd;
+  background: #fef2f2;
+}
+
+.upload-file-name {
+  font-weight: 600;
+  color: #1a1a2e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-file-size,
+.upload-file-type {
+  color: #666;
+}
+
+.upload-file-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.upload-file-row.status-error .upload-file-status-pill {
+  color: #d93025;
+}
+
+.upload-file-remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: #f0f2f5;
+  color: #666;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.upload-file-remove-btn:hover {
+  background: #fde8e8;
+  color: #d93025;
+}
+
+@media (max-width: 640px) {
+  .upload-file-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .upload-file-row-header {
+    display: none;
+  }
+}
+
+/* ── Paso 3: progreso de análisis ── */
+.analysis-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0 4px;
+}
+
+.analysis-progress-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.analysis-progress-subtitle {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 14px;
+}
+
+.analysis-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.analysis-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #888;
+  transition: background 0.2s, color 0.2s;
+}
+
+.analysis-progress-item.done {
+  color: #16a34a;
+}
+
+.analysis-progress-item.active {
+  color: #008AAB;
+  background: #e8f6f9;
+  font-weight: 600;
+}
+
+.analysis-progress-item.pending {
+  color: #c8d0dc;
+}
+
+.analysis-progress-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Utilidad de animación (spinner) ── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
