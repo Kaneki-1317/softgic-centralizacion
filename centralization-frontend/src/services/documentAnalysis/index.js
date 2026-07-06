@@ -1,13 +1,12 @@
 // Barrel del DocumentAnalysisService.
 //
-// Este es el ÚNICO punto de conexión que debe cambiar cuando exista la
-// integración real con n8n / OpenAI: reemplazar la importación de abajo por
-// la implementación real (p. ej. "./DocumentAnalysisService.n8n") y mantener
-// el mismo contrato (ver documentAnalysisContract.js). Ningún componente
-// (NewCaseWizard, DocumentUploadStep, AnalysisProgressStep) ni AdminPage
-// necesita cambiar.
-import mockDocumentAnalysisService from "./DocumentAnalysisService.mock";
+// Este es el ÚNICO punto de conexión que cambia según el entorno de análisis
+// de documentos. Implementación activa: DocumentAnalysisService.spring.js
+// (llama a POST /casos/analizar-documento, que Spring Boot reenvía a n8n).
+// Ningún componente (NewCaseWizard, DocumentUploadStep, AnalysisProgressStep)
+// ni AdminPage necesita cambiar.
+import documentAnalysisService from "./DocumentAnalysisService.spring";
 
-export const documentAnalysisService = mockDocumentAnalysisService;
+export { documentAnalysisService };
 
 export { STAGE, STAGE_ORDER, STAGE_LABELS } from "./documentAnalysisContract";

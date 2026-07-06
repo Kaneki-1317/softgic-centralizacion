@@ -11,9 +11,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.softgic.centralization.dto.ErrorResponseDTO;
+import com.softgic.centralization.exception.N8nIntegrationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(N8nIntegrationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleN8nIntegration(N8nIntegrationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new ErrorResponseDTO(
+                LocalDateTime.now().toString(),
+                HttpStatus.BAD_GATEWAY.value(),
+                "N8N_INTEGRATION_ERROR",
+                ex.getMessage()));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex) {
