@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Settings2, LayoutList, FlaskConical, Tag, TrendingUp, Building2, Paperclip, Plus, X, FileText, Trash2 } from "lucide-react";
 import api from "../../services/api";
 import { useToast } from "../../context/ToastContext";
+import SelectionCard from "./SelectionCard";
 
 const DOC_TYPES = [
   { value: "PDF",  label: "PDF",         color: "#dc2626", bg: "#fef2f2" },
@@ -449,11 +450,13 @@ export default function CaseFormModal({
             </section>
 
             {/* Tecnologías */}
-            <section className="modal-section">
+            <SelectionCard
+              icon={<Settings2 size={13} />}
+              title="Tecnologías"
+              aiItems={prefillData?.tecnologias}
+            >
               <div className="section-label-row">
-                <h4 className="modal-section-label">
-                  <Settings2 size={13} /> Tecnologías
-                </h4>
+                <h4 className="modal-section-label">Tecnologías seleccionadas</h4>
                 <SectionActions
                   type="tecnologia"
                   createLabel="Nueva"
@@ -471,14 +474,16 @@ export default function CaseFormModal({
                 onToggle={toggleId}
                 onAskDelete={askDelete}
               />
-            </section>
+            </SelectionCard>
 
             {/* Categorías */}
-            <section className="modal-section">
+            <SelectionCard
+              icon={<LayoutList size={13} />}
+              title="Área de aplicación"
+              aiItems={prefillData?.categorias}
+            >
               <div className="section-label-row">
-                <h4 className="modal-section-label">
-                  <LayoutList size={13} /> Área de aplicación
-                </h4>
+                <h4 className="modal-section-label">Áreas seleccionadas</h4>
                 <SectionActions
                   type="categoria"
                   createLabel="Nueva"
@@ -496,14 +501,16 @@ export default function CaseFormModal({
                 onToggle={toggleId}
                 onAskDelete={askDelete}
               />
-            </section>
+            </SelectionCard>
 
             {/* Laboratorios */}
-            <section className="modal-section">
+            <SelectionCard
+              icon={<FlaskConical size={13} />}
+              title="Equipo / Unidad"
+              aiItems={prefillData?.laboratorios}
+            >
               <div className="section-label-row">
-                <h4 className="modal-section-label">
-                  <FlaskConical size={13} /> Equipo / Unidad
-                </h4>
+                <h4 className="modal-section-label">Equipos seleccionados</h4>
                 <SectionActions
                   type="laboratorio"
                   createLabel="Nuevo"
@@ -521,7 +528,7 @@ export default function CaseFormModal({
                 onToggle={toggleId}
                 onAskDelete={askDelete}
               />
-            </section>
+            </SelectionCard>
 
             {/* Documentos del caso */}
             <section className="modal-section docs-section">

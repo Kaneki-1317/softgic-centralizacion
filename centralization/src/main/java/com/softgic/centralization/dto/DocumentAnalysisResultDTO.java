@@ -2,6 +2,8 @@ package com.softgic.centralization.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import jakarta.validation.constraints.NotBlank;
 
 public class DocumentAnalysisResultDTO {
@@ -28,8 +30,16 @@ public class DocumentAnalysisResultDTO {
 
     private List<String> tecnologias;
 
+    // n8n históricamente ha usado "categorias"; el prompt/flujo actual puede
+    // devolver "areasAplicacion" para el mismo concepto — se acepta cualquiera
+    // de los dos nombres en la entrada, pero se expone siempre como
+    // "categorias" hacia el frontend (sin cambiar el contrato ya consumido).
+    @JsonAlias("areasAplicacion")
     private List<String> categorias;
 
+    // Mismo caso que categorias/areasAplicacion, pero para "laboratorios" vs
+    // "equipoUnidad".
+    @JsonAlias("equipoUnidad")
     private List<String> laboratorios;
 
     public DocumentAnalysisResultDTO() {}
