@@ -37,10 +37,4 @@ public class LoginRateLimiter {
         failedAttempts.remove(key);
         blockedUntil.remove(key);
     }
-
-    public int getRemainingAttempts(String key) {
-        AtomicInteger counter = failedAttempts.get(key);
-        if (counter == null) return MAX_ATTEMPTS;
-        return Math.max(0, MAX_ATTEMPTS - counter.get());
-    }
 }

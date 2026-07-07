@@ -775,6 +775,9 @@ nav a:hover {
 
 .skeleton-card {
   pointer-events: none;
+  position: relative;
+  overflow: hidden;
+  min-height: 220px;
 }
 
 .skeleton-card .card-title-block h2,
@@ -794,12 +797,6 @@ nav a:hover {
   background: linear-gradient(90deg, #f0f2f5 25%, #e4e7ec 50%, #f0f2f5 75%);
   background-size: 600px 100%;
   animation: shimmer 1.4s infinite linear;
-}
-
-.skeleton-card {
-  position: relative;
-  overflow: hidden;
-  min-height: 220px;
 }
 
 /* ── Empty state ── */

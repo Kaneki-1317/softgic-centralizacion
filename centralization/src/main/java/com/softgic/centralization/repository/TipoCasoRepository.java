@@ -7,5 +7,5 @@ import com.softgic.centralization.model.TipoCaso;
 
 @Repository
 public interface TipoCasoRepository extends JpaRepository<TipoCaso, Long> {
-
+    
 }

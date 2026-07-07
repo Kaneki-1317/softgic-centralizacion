@@ -93,6 +93,56 @@ function buildFormFromExternalShape(source, tiposCasos, tecnologias, categorias,
   };
 }
 
+// ── Pill list renderer ───────────────────────────────────────────────────────
+// Hoisted out of CaseFormModal (not a closure) so it isn't recreated on every
+// render — a component redefined per-render loses its identity and forces
+// React to remount it instead of reconciling, resetting any internal state.
+function PillList({ items, selectedIds, field, type, isDeleteMode, onToggle, onAskDelete }) {
+  return (
+    <div className="modal-tags">
+      {items.map((item) => (
+        <div key={item.id} className="pill-wrapper">
+          <button
+            type="button"
+            className={`form-tag-pill ${selectedIds.includes(item.id) ? "selected" : ""} ${isDeleteMode ? "delete-mode-pill" : ""}`}
+            onClick={() => !isDeleteMode && onToggle(field, item.id)}
+          >
+            {item.label}
+          </button>
+          {isDeleteMode && (
+            <button
+              type="button"
+              className="pill-delete-x"
+              onClick={() => onAskDelete(type, item)}
+              title={`Eliminar "${item.label}"`}
+            >
+              <X size={9} />
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Section header renderer ──────────────────────────────────────────────────
+function SectionActions({ type, createLabel, isDeleteMode, onQuickCreate, onToggleDeleteMode }) {
+  return (
+    <div className="section-label-actions">
+      <button type="button" className="quick-create-btn" onClick={() => onQuickCreate(type)}>
+        <Plus size={12} /> {createLabel}
+      </button>
+      <button
+        type="button"
+        className={`delete-mode-btn ${isDeleteMode ? "active" : ""}`}
+        onClick={() => onToggleDeleteMode(type)}
+      >
+        <Trash2 size={12} /> Eliminar
+      </button>
+    </div>
+  );
+}
+
 export default function CaseFormModal({
   open,
   initialData,
@@ -277,56 +327,6 @@ export default function CaseFormModal({
     }
   }
 
-  // ── Pill list renderer ───────────────────────────────────────────────────────
-
-  function PillList({ items, field, type }) {
-    const isDeleteMode = deleteMode[type];
-    return (
-      <div className="modal-tags">
-        {items.map((item) => (
-          <div key={item.id} className="pill-wrapper">
-            <button
-              type="button"
-              className={`form-tag-pill ${form[field].includes(item.id) ? "selected" : ""} ${isDeleteMode ? "delete-mode-pill" : ""}`}
-              onClick={() => !isDeleteMode && toggleId(field, item.id)}
-            >
-              {item.label}
-            </button>
-            {isDeleteMode && (
-              <button
-                type="button"
-                className="pill-delete-x"
-                onClick={() => askDelete(type, item)}
-                title={`Eliminar "${item.label}"`}
-              >
-                <X size={9} />
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  // ── Section header renderer ──────────────────────────────────────────────────
-
-  function SectionActions({ type, createLabel }) {
-    return (
-      <div className="section-label-actions">
-        <button type="button" className="quick-create-btn" onClick={() => openQuickCreate(type)}>
-          <Plus size={12} /> {createLabel}
-        </button>
-        <button
-          type="button"
-          className={`delete-mode-btn ${deleteMode[type] ? "active" : ""}`}
-          onClick={() => toggleDeleteMode(type)}
-        >
-          <Trash2 size={12} /> Eliminar
-        </button>
-      </div>
-    );
-  }
-
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
@@ -454,9 +454,23 @@ export default function CaseFormModal({
                 <h4 className="modal-section-label">
                   <Settings2 size={13} /> Tecnologías
                 </h4>
-                <SectionActions type="tecnologia" createLabel="Nueva" />
+                <SectionActions
+                  type="tecnologia"
+                  createLabel="Nueva"
+                  isDeleteMode={deleteMode.tecnologia}
+                  onQuickCreate={openQuickCreate}
+                  onToggleDeleteMode={toggleDeleteMode}
+                />
               </div>
-              <PillList items={localTecs} field="idsTecnologias" type="tecnologia" />
+              <PillList
+                items={localTecs}
+                selectedIds={form.idsTecnologias}
+                field="idsTecnologias"
+                type="tecnologia"
+                isDeleteMode={deleteMode.tecnologia}
+                onToggle={toggleId}
+                onAskDelete={askDelete}
+              />
             </section>
 
             {/* Categorías */}
@@ -465,9 +479,23 @@ export default function CaseFormModal({
                 <h4 className="modal-section-label">
                   <LayoutList size={13} /> Área de aplicación
                 </h4>
-                <SectionActions type="categoria" createLabel="Nueva" />
+                <SectionActions
+                  type="categoria"
+                  createLabel="Nueva"
+                  isDeleteMode={deleteMode.categoria}
+                  onQuickCreate={openQuickCreate}
+                  onToggleDeleteMode={toggleDeleteMode}
+                />
               </div>
-              <PillList items={localCats} field="idsCategorias" type="categoria" />
+              <PillList
+                items={localCats}
+                selectedIds={form.idsCategorias}
+                field="idsCategorias"
+                type="categoria"
+                isDeleteMode={deleteMode.categoria}
+                onToggle={toggleId}
+                onAskDelete={askDelete}
+              />
             </section>
 
             {/* Laboratorios */}
@@ -476,9 +504,23 @@ export default function CaseFormModal({
                 <h4 className="modal-section-label">
                   <FlaskConical size={13} /> Equipo / Unidad
                 </h4>
-                <SectionActions type="laboratorio" createLabel="Nuevo" />
+                <SectionActions
+                  type="laboratorio"
+                  createLabel="Nuevo"
+                  isDeleteMode={deleteMode.laboratorio}
+                  onQuickCreate={openQuickCreate}
+                  onToggleDeleteMode={toggleDeleteMode}
+                />
               </div>
-              <PillList items={localLabs} field="idsLaboratorios" type="laboratorio" />
+              <PillList
+                items={localLabs}
+                selectedIds={form.idsLaboratorios}
+                field="idsLaboratorios"
+                type="laboratorio"
+                isDeleteMode={deleteMode.laboratorio}
+                onToggle={toggleId}
+                onAskDelete={askDelete}
+              />
             </section>
 
             {/* Documentos del caso */}
