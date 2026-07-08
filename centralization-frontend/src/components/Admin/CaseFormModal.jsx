@@ -143,6 +143,8 @@ function PillList({ items, selectedIds, field, type, isDeleteMode, onToggle, onA
             type="button"
             className={`form-tag-pill ${selectedIds.includes(item.id) ? "selected" : ""} ${isDeleteMode ? "delete-mode-pill" : ""}`}
             onClick={() => !isDeleteMode && onToggle(field, item.id)}
+            aria-pressed={selectedIds.includes(item.id)}
+            aria-disabled={isDeleteMode}
           >
             {item.label}
           </button>
@@ -174,6 +176,7 @@ function SectionActions({ type, createLabel, isDeleteMode, onQuickCreate, onTogg
         type="button"
         className={`delete-mode-btn ${isDeleteMode ? "active" : ""}`}
         onClick={() => onToggleDeleteMode(type)}
+        aria-pressed={isDeleteMode}
       >
         <Trash2 size={12} /> Eliminar
       </button>
@@ -505,6 +508,7 @@ export default function CaseFormModal({
                   type="button"
                   className={`form-tipo-pill ${form.idTipoCaso === t.id ? "selected" : ""}`}
                   onClick={() => setForm({ ...form, idTipoCaso: t.id })}
+                  aria-pressed={form.idTipoCaso === t.id}
                 >
                   {t.nombreTipo}
                 </button>
@@ -726,6 +730,7 @@ export default function CaseFormModal({
                                 ? { background: dt.bg, color: dt.color, borderColor: dt.color }
                                 : {}}
                               onClick={() => updateDocumento(i, "tipo", dt.value)}
+                              aria-pressed={doc.tipo === dt.value}
                             >
                               {dt.label}
                             </button>

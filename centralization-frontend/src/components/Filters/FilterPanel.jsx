@@ -44,6 +44,7 @@ export default function FilterPanel({
       )}
 
       <div
+        id="filter-drawer"
         className={`filter-drawer ${open ? "open" : ""}`}
         role="dialog"
         aria-modal={open}

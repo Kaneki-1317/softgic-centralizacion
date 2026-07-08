@@ -115,7 +115,12 @@ export default function PublicPage() {
       <main className="public-layout" id="casos">
 
         <div className="search-topbar">
-          <button className="filter-toggle" onClick={() => setDrawerOpen(true)}>
+          <button
+            className="filter-toggle"
+            onClick={() => setDrawerOpen(true)}
+            aria-expanded={drawerOpen}
+            aria-controls="filter-drawer"
+          >
             <span className="hamburger-icon">&#9776;</span> Filtrar
             {activeFilterCount > 0 && (
               <span className="filter-badge">{activeFilterCount}</span>

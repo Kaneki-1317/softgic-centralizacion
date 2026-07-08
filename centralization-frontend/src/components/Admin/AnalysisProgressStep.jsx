@@ -22,7 +22,11 @@ export default function AnalysisProgressStep({ currentStage }) {
             index < currentIndex ? "done" : index === currentIndex ? "active" : "pending";
 
           return (
-            <li key={stage} className={`analysis-progress-item ${state}`}>
+            <li
+              key={stage}
+              className={`analysis-progress-item ${state}`}
+              aria-current={state === "active" ? "step" : undefined}
+            >
               <span className="analysis-progress-icon">
                 {state === "done" && <CheckCircle2 size={18} />}
                 {state === "active" && <Loader2 size={18} className="spin" />}
