@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
   Routes,
   Route,
@@ -12,6 +14,8 @@ import {
   useAuth,
 } from "./context/AuthContext";
 
+import { useToast } from "./context/ToastContext";
+
 import ToastViewport from "./components/Shared/ToastViewport";
 
 function PrivateRoute({ children }) {
@@ -25,6 +29,20 @@ function GuestRoute({ children }) {
 }
 
 export default function App() {
+  const { showToast } = useToast();
+
+  // Si el interceptor de api.js forzó un cierre de sesión por un 401, deja
+  // el mensaje en sessionStorage antes de recargar la página. Lo mostramos
+  // una sola vez aquí, en el componente raíz, y lo limpiamos de inmediato.
+  useEffect(() => {
+    const message = sessionStorage.getItem("sessionExpiredMessage");
+    if (message) {
+      sessionStorage.removeItem("sessionExpiredMessage");
+      showToast(message, "error");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <ToastViewport />
