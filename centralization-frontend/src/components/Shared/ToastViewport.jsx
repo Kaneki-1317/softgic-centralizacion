@@ -11,7 +11,7 @@ export default function ToastViewport() {
   const { toasts } = useToast();
 
   return (
-    <div className="toast-viewport">
+    <div className="toast-viewport" role="status" aria-live="polite">
       {toasts.map((toast) => (
         <div key={toast.id} className={`toast toast-${toast.type}`}>
           <span className="toast-icon">{ICONS[toast.type] ?? ICONS.info}</span>

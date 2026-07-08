@@ -126,6 +126,7 @@ export default function PublicPage() {
               type="text"
               className="search-input"
               placeholder="Buscar por palabras clave..."
+              aria-label="Buscar por palabras clave"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}

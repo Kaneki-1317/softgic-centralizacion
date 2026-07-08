@@ -57,10 +57,11 @@ export default function LoginPage() {
 
           <div className="login-fields">
             <div className="login-field">
-              <label>Correo electrónico</label>
+              <label htmlFor="login-email">Correo electrónico</label>
               <div className="login-input-wrap">
                 <Mail size={16} className="login-input-icon" />
                 <input
+                  id="login-email"
                   type="email"
                   placeholder="admin@softgic.com"
                   value={email}
@@ -71,10 +72,11 @@ export default function LoginPage() {
             </div>
 
             <div className="login-field">
-              <label>Contraseña</label>
+              <label htmlFor="login-password">Contraseña</label>
               <div className="login-input-wrap">
                 <Lock size={16} className="login-input-icon" />
                 <input
+                  id="login-password"
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -86,7 +88,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="login-error">{error}</div>
+            <div className="login-error" role="alert">{error}</div>
           )}
 
           <button className="login-submit" type="submit" disabled={loading}>

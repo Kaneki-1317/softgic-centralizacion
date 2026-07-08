@@ -5,13 +5,19 @@ export default function ConfirmModal({ open, onConfirm, onCancel }) {
 
   return (
     <div className="modal-overlay confirm-overlay" onClick={onCancel}>
-      <div className="confirm-panel" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="confirm-panel"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+      >
 
         <div className="confirm-icon">
           <Trash2 size={28} />
         </div>
 
-        <h3>¿Eliminar este caso?</h3>
+        <h3 id="confirm-modal-title">¿Eliminar este caso?</h3>
         <p>Esta acción no se puede deshacer.</p>
 
         <div className="confirm-actions">

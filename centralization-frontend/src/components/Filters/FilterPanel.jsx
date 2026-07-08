@@ -16,15 +16,20 @@ export default function FilterPanel({
         <div className="drawer-overlay" onClick={onClose} />
       )}
 
-      <div className={`filter-drawer ${open ? "open" : ""}`}>
+      <div
+        className={`filter-drawer ${open ? "open" : ""}`}
+        role="dialog"
+        aria-modal={open}
+        aria-labelledby="filter-drawer-title"
+      >
         <div className="drawer-header">
           <div className="drawer-header-left">
-            <h3>Filtros</h3>
+            <h3 id="filter-drawer-title">Filtros</h3>
             {activeCount > 0 && (
               <span className="drawer-active-count">{activeCount} activo{activeCount > 1 ? "s" : ""}</span>
             )}
           </div>
-          <button className="drawer-close" onClick={onClose}>&#10005;</button>
+          <button className="drawer-close" onClick={onClose} aria-label="Cerrar filtros">&#10005;</button>
         </div>
 
         <div className="drawer-body">

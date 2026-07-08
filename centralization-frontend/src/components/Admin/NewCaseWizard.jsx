@@ -89,8 +89,14 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
 
   return (
     <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={handleClose}>&#10005;</button>
+      <div
+        className="modal-panel"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Nuevo Caso"
+      >
+        <button className="modal-close" onClick={handleClose} aria-label="Cerrar">&#10005;</button>
 
         <div className="modal-body">
           {step === STEP.CHOOSER && (

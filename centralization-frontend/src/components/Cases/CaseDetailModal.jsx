@@ -12,9 +12,15 @@ export default function CaseDetailModal({ item, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-panel"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="case-detail-modal-title"
+      >
 
-        <button className="modal-close" onClick={onClose}>&#10005;</button>
+        <button className="modal-close" onClick={onClose} aria-label="Cerrar">&#10005;</button>
 
         {/* Header */}
         <div className="modal-header">
@@ -39,7 +45,7 @@ export default function CaseDetailModal({ item, onClose }) {
             )}
           </div>
 
-          <h2 className="modal-title">{item.titulo}</h2>
+          <h2 className="modal-title" id="case-detail-modal-title">{item.titulo}</h2>
 
           {item.cliente && (
             <p className="modal-client">Cliente: <strong>{item.cliente}</strong></p>

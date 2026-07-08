@@ -124,6 +124,7 @@ export default function DocumentUploadStep({ entries, onEntriesChange, onAnalyze
                 className="upload-file-remove-btn"
                 onClick={() => removeEntry(entry.id)}
                 title="Quitar archivo"
+                aria-label="Quitar archivo"
               >
                 <X size={13} />
               </button>

@@ -152,6 +152,7 @@ function PillList({ items, selectedIds, field, type, isDeleteMode, onToggle, onA
               className="pill-delete-x"
               onClick={() => onAskDelete(type, item)}
               title={`Eliminar "${item.label}"`}
+              aria-label={`Eliminar "${item.label}"`}
             >
               <X size={9} />
             </button>
@@ -424,15 +425,21 @@ export default function CaseFormModal({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-panel"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="case-form-modal-title"
+      >
 
-        <button className="modal-close" onClick={onClose}>&#10005;</button>
+        <button className="modal-close" onClick={onClose} aria-label="Cerrar">&#10005;</button>
 
         <form onSubmit={handleSubmit}>
 
           {/* Header */}
           <div className="modal-header">
-            <p className="form-modal-eyebrow">
+            <p className="form-modal-eyebrow" id="case-form-modal-title">
               {initialData ? "Editar Caso" : "Nuevo Caso"}
             </p>
 
@@ -455,6 +462,7 @@ export default function CaseFormModal({
             <input
               className="form-title-input"
               placeholder="Título del caso..."
+              aria-label="Título del caso"
               value={form.titulo}
               onChange={(e) => setForm({ ...form, titulo: e.target.value })}
               required
@@ -471,6 +479,7 @@ export default function CaseFormModal({
               <input
                 className="form-input"
                 placeholder="Ej: Salud, Finanzas, Retail..."
+                aria-label="Sector / Industria"
                 value={form.sector}
                 onChange={(e) => setForm({ ...form, sector: e.target.value })}
                 required
@@ -482,6 +491,7 @@ export default function CaseFormModal({
               <input
                 className="form-input"
                 placeholder="Nombre del cliente o empresa..."
+                aria-label="Cliente (opcional)"
                 value={form.cliente}
                 onChange={(e) => setForm({ ...form, cliente: e.target.value })}
               />
@@ -493,6 +503,7 @@ export default function CaseFormModal({
                 className="form-input"
                 type="number"
                 placeholder="Ej: 2024"
+                aria-label="Año de implementación (opcional)"
                 min="2000"
                 max="2100"
                 value={form.anioImplementacion}
@@ -507,6 +518,7 @@ export default function CaseFormModal({
               <textarea
                 className="form-textarea-ghost"
                 placeholder='Una frase que resuma el valor obtenido. Ej: "Reducción del 60% en tiempos de gestión"'
+                aria-label="Beneficio principal"
                 value={form.beneficioPrincipal}
                 onChange={(e) => setForm({ ...form, beneficioPrincipal: e.target.value })}
                 rows={2}
@@ -521,6 +533,7 @@ export default function CaseFormModal({
               <textarea
                 className="form-textarea"
                 placeholder="¿Cuál era el problema o necesidad del cliente?"
+                aria-label="Reto / Desafío"
                 value={form.reto}
                 onChange={(e) => setForm({ ...form, reto: e.target.value })}
                 rows={4}
@@ -535,6 +548,7 @@ export default function CaseFormModal({
               <textarea
                 className="form-textarea"
                 placeholder="¿Qué se logró? Incluye métricas si las tienes."
+                aria-label="Resultados obtenidos (opcional)"
                 value={form.resultados}
                 onChange={(e) => setForm({ ...form, resultados: e.target.value })}
                 rows={3}
@@ -665,7 +679,12 @@ export default function CaseFormModal({
                             </button>
                           ))}
                         </div>
-                        <button type="button" className="doc-remove-btn" onClick={() => removeDocumento(i)}>
+                        <button
+                          type="button"
+                          className="doc-remove-btn"
+                          onClick={() => removeDocumento(i)}
+                          aria-label="Quitar documento"
+                        >
                           <X size={13} />
                         </button>
                       </div>
@@ -673,6 +692,7 @@ export default function CaseFormModal({
                         <input
                           className="form-input"
                           placeholder="Nombre del documento..."
+                          aria-label="Nombre del documento"
                           value={doc.nombre}
                           onChange={(e) => updateDocumento(i, "nombre", e.target.value)}
                         />
@@ -680,6 +700,7 @@ export default function CaseFormModal({
                           className="form-input"
                           type="url"
                           placeholder="https://..."
+                          aria-label="URL del documento"
                           value={doc.url}
                           onChange={(e) => updateDocumento(i, "url", e.target.value)}
                         />
@@ -703,10 +724,16 @@ export default function CaseFormModal({
         {/* ── Quick-create sub-modal ── */}
         {quickCreate.open && (
           <div className="quick-create-overlay" onClick={closeQuickCreate}>
-            <div className="quick-create-panel" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="quick-create-panel"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="quick-create-modal-title"
+            >
               <div className="quick-create-header">
-                <h5 className="quick-create-title">{QUICK_CONFIG[quickCreate.type].title}</h5>
-                <button type="button" className="quick-create-close" onClick={closeQuickCreate}>
+                <h5 className="quick-create-title" id="quick-create-modal-title">{QUICK_CONFIG[quickCreate.type].title}</h5>
+                <button type="button" className="quick-create-close" onClick={closeQuickCreate} aria-label="Cerrar">
                   <X size={15} />
                 </button>
               </div>
@@ -714,6 +741,8 @@ export default function CaseFormModal({
                 <input
                   className="form-input"
                   placeholder={QUICK_CONFIG[quickCreate.type].placeholder}
+                  aria-label={QUICK_CONFIG[quickCreate.type].title}
+                  aria-describedby={quickCreate.error ? "quick-create-error" : undefined}
                   value={quickCreate.name}
                   onChange={(e) => setQuickCreate((prev) => ({ ...prev, name: e.target.value, error: "" }))}
                   autoFocus
@@ -721,7 +750,7 @@ export default function CaseFormModal({
                   maxLength={100}
                 />
                 {quickCreate.error && (
-                  <p className="quick-create-error">{quickCreate.error}</p>
+                  <p className="quick-create-error" id="quick-create-error" role="alert">{quickCreate.error}</p>
                 )}
                 <div className="quick-create-actions">
                   <button type="button" className="ghost-button" onClick={closeQuickCreate}>
@@ -739,11 +768,17 @@ export default function CaseFormModal({
         {/* ── Confirm-delete sub-modal ── */}
         {confirmDelete.open && (
           <div className="quick-create-overlay" onClick={cancelDelete}>
-            <div className="confirm-panel" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="confirm-panel"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="confirm-delete-modal-title"
+            >
               <div className="confirm-icon">
                 <Trash2 size={28} />
               </div>
-              <h3>{DELETE_MESSAGES[confirmDelete.type]}</h3>
+              <h3 id="confirm-delete-modal-title">{DELETE_MESSAGES[confirmDelete.type]}</h3>
               <p>
                 Se eliminará <strong>"{confirmDelete.item?.label}"</strong> de todos los casos donde aparezca.
                 Esta acción no se puede deshacer.
