@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Settings2, LayoutList, FlaskConical, Tag, TrendingUp, Building2, Paperclip, Plus, X, FileText, Trash2 } from "lucide-react";
 import api from "../../services/api";
 import { useToast } from "../../context/ToastContext";
@@ -220,6 +220,13 @@ export default function CaseFormModal({
     tecnologia: new Set(), categoria: new Set(), laboratorio: new Set(),
   });
 
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+  // Compartida entre los 2 sub-modales (crear rápido / confirmar eliminar):
+  // nunca están abiertos a la vez, así que un solo ref alcanza para recordar
+  // qué elemento abrió el que esté visible en cada momento.
+  const subModalTriggerRef = useRef(null);
+
   // Sync local lists whenever parent updates them
   useEffect(() => { setLocalTecs(tecnologias); }, [tecnologias]);
   useEffect(() => { setLocalCats(categorias);  }, [categorias]);
@@ -270,6 +277,20 @@ export default function CaseFormModal({
     // envolverlas en useCallback está fuera del alcance de esta tarea.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, confirmDelete.open, quickCreate.open]);
+
+  // Al abrir el formulario, mueve el foco y recuerda qué elemento lo abrió;
+  // al cerrarlo, el foco vuelve ahí. Los sub-modales gestionan el suyo por
+  // separado (ver openQuickCreate/closeQuickCreate y askDelete/cancelDelete).
+  useEffect(() => {
+    if (!open) return;
+
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      previouslyFocusedRef.current?.focus?.();
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -332,11 +353,13 @@ export default function CaseFormModal({
   // ── Quick-create handlers ────────────────────────────────────────────────────
 
   function openQuickCreate(type) {
+    subModalTriggerRef.current = document.activeElement;
     setQuickCreate({ open: true, type, name: "", loading: false, error: "" });
   }
 
   function closeQuickCreate() {
     setQuickCreate({ open: false, type: null, name: "", loading: false, error: "" });
+    subModalTriggerRef.current?.focus?.();
   }
 
   async function handleQuickCreate(e) {
@@ -408,11 +431,13 @@ export default function CaseFormModal({
   }
 
   function askDelete(type, item) {
+    subModalTriggerRef.current = document.activeElement;
     setConfirmDelete({ open: true, type, item, loading: false });
   }
 
   function cancelDelete() {
     setConfirmDelete({ open: false, type: null, item: null, loading: false });
+    subModalTriggerRef.current?.focus?.();
   }
 
   async function handleConfirmDelete() {
@@ -432,10 +457,12 @@ export default function CaseFormModal({
       onMetadataDeleted?.(type, item.id);
       showToast(`"${item.label}" eliminado correctamente`, "success");
       setConfirmDelete({ open: false, type: null, item: null, loading: false });
+      subModalTriggerRef.current?.focus?.();
     } catch (err) {
       const msg = err.response?.data?.mensaje || "Error al eliminar. Intenta de nuevo";
       showToast(msg, "error");
       setConfirmDelete({ open: false, type: null, item: null, loading: false });
+      subModalTriggerRef.current?.focus?.();
     }
   }
 
@@ -458,7 +485,7 @@ export default function CaseFormModal({
         aria-labelledby="case-form-modal-title"
       >
 
-        <button className="modal-close" onClick={onClose} aria-label="Cerrar">&#10005;</button>
+        <button className="modal-close" onClick={onClose} aria-label="Cerrar" ref={closeButtonRef}>&#10005;</button>
 
         <form onSubmit={handleSubmit}>
 

@@ -1,7 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Trash2 } from "lucide-react";
 
 export default function ConfirmModal({ open, onConfirm, onCancel }) {
+  const cancelButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+
   useEffect(() => {
     if (!open) return;
 
@@ -12,6 +15,19 @@ export default function ConfirmModal({ open, onConfirm, onCancel }) {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, onCancel]);
+
+  // Al abrir, foco en "Cancelar" (opción no destructiva por defecto) y se
+  // recuerda qué elemento lo abrió; al cerrar, el foco vuelve ahí.
+  useEffect(() => {
+    if (!open) return;
+
+    previouslyFocusedRef.current = document.activeElement;
+    cancelButtonRef.current?.focus();
+
+    return () => {
+      previouslyFocusedRef.current?.focus?.();
+    };
+  }, [open]);
 
   if (!open) return null;
 
@@ -33,7 +49,7 @@ export default function ConfirmModal({ open, onConfirm, onCancel }) {
         <p>Esta acción no se puede deshacer.</p>
 
         <div className="confirm-actions">
-          <button className="ghost-button" onClick={onCancel}>
+          <button className="ghost-button" onClick={onCancel} ref={cancelButtonRef}>
             Cancelar
           </button>
           <button className="danger-button" onClick={onConfirm}>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import SelectFilter from "./SelectFilter";
 
 export default function FilterPanel({
@@ -10,6 +10,8 @@ export default function FilterPanel({
   onClear,
 }) {
   const activeCount = Object.values(filters).filter(Boolean).length;
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
@@ -21,6 +23,19 @@ export default function FilterPanel({
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
+
+  // Al abrir, mueve el foco al drawer y recuerda qué elemento lo abrió; al
+  // cerrar, devuelve el foco ahí — sin focus trap, solo estos dos momentos.
+  useEffect(() => {
+    if (!open) return;
+
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      previouslyFocusedRef.current?.focus?.();
+    };
+  }, [open]);
 
   return (
     <>
@@ -42,7 +57,7 @@ export default function FilterPanel({
               <span className="drawer-active-count">{activeCount} activo{activeCount > 1 ? "s" : ""}</span>
             )}
           </div>
-          <button className="drawer-close" onClick={onClose} aria-label="Cerrar filtros">&#10005;</button>
+          <button className="drawer-close" onClick={onClose} aria-label="Cerrar filtros" ref={closeButtonRef}>&#10005;</button>
         </div>
 
         <div className="drawer-body">

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AlertTriangle, Settings2, LayoutList, FlaskConical, Building2, CalendarCheck, ExternalLink, TrendingUp, FileText, Paperclip } from "lucide-react";
 
 const DOC_META = {
@@ -9,6 +9,9 @@ const DOC_META = {
 };
 
 export default function CaseDetailModal({ item, onClose }) {
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+
   useEffect(() => {
     if (!item) return;
 
@@ -19,6 +22,19 @@ export default function CaseDetailModal({ item, onClose }) {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [item, onClose]);
+
+  // Al abrir, mueve el foco al modal y recuerda qué elemento lo abrió; al
+  // cerrar, el foco vuelve ahí.
+  useEffect(() => {
+    if (!item) return;
+
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      previouslyFocusedRef.current?.focus?.();
+    };
+  }, [item]);
 
   if (!item) return null;
 
@@ -32,7 +48,7 @@ export default function CaseDetailModal({ item, onClose }) {
         aria-labelledby="case-detail-modal-title"
       >
 
-        <button className="modal-close" onClick={onClose} aria-label="Cerrar">&#10005;</button>
+        <button className="modal-close" onClick={onClose} aria-label="Cerrar" ref={closeButtonRef}>&#10005;</button>
 
         {/* Header */}
         <div className="modal-header">

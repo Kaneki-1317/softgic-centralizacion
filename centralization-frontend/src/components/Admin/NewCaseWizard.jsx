@@ -48,6 +48,8 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
   const [fileEntries, setFileEntries] = useState([]);
   const [analysisStage, setAnalysisStage] = useState(null);
   const cancelledRef = useRef(false);
+  const closeButtonRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
 
   // Red de seguridad adicional a handleClose: si el componente se desmonta
   // por otra razón (p. ej. el padre navega fuera de AdminPage) mientras un
@@ -55,6 +57,19 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
   // onComplete/showToast sobre un componente que ya no está.
   useEffect(() => {
     return () => { cancelledRef.current = true; };
+  }, []);
+
+  // El wizard solo se monta mientras está abierto (ver comentario de arriba),
+  // así que el foco se gestiona con el ciclo de montaje/desmontaje: al montar
+  // se recuerda qué elemento lo abrió y se enfoca el modal; al desmontar, el
+  // foco vuelve ahí.
+  useEffect(() => {
+    previouslyFocusedRef.current = document.activeElement;
+    closeButtonRef.current?.focus();
+
+    return () => {
+      previouslyFocusedRef.current?.focus?.();
+    };
   }, []);
 
   function handleClose() {
@@ -106,7 +121,7 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
         aria-modal="true"
         aria-label="Nuevo Caso"
       >
-        <button className="modal-close" onClick={handleClose} aria-label="Cerrar">&#10005;</button>
+        <button className="modal-close" onClick={handleClose} aria-label="Cerrar" ref={closeButtonRef}>&#10005;</button>
 
         <div className="modal-body">
           {step === STEP.CHOOSER && (

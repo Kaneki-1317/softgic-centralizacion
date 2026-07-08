@@ -866,7 +866,7 @@ nav a:hover {
 }
 
 .ai-chip-actionable:focus-visible {
-  outline: 2px solid #1d4ed8;
+  outline: 2px solid #0d2d6b;
   outline-offset: 2px;
 }
 
@@ -2536,5 +2536,24 @@ body::-webkit-scrollbar-corner,
 
 .spin {
   animation: spin 0.9s linear infinite;
+}
+
+/* ════════════════════════════════
+   FOCO VISIBLE (accesibilidad — WCAG 2.4.7 / 2.4.11)
+   Un solo color de anillo de foco, reutilizado de la marca (el mismo navy de
+   ghost-button/drawer), verificado contra los 3 fondos reales de la app
+   (blanco, teal del buscador, naranja del navbar público) — el teal/azul que
+   ya usaba .ai-chip-actionable falla el contraste 3:1 sobre esos mismos
+   fondos, por eso no se generaliza ese color.
+   ════════════════════════════════ */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #0d2d6b;
+  outline-offset: 2px;
 }
 
