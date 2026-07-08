@@ -1,0 +1,3 @@
+# Evita que dependencias instaladas por error en la raíz del repo
+# (en vez de dentro de centralization-frontend/) se vuelvan a commitear.
+node_modules/
