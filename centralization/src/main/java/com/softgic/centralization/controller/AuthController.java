@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -32,6 +33,9 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
     private final LoginRateLimiter rateLimiter;
+
+    @Value("${app.security.trust-proxy-headers:false}")
+    private boolean trustProxyHeaders;
 
     public AuthController(AdminRepository adminRepository,
                           JwtUtil jwtUtil,
@@ -95,10 +99,20 @@ public class AuthController {
         return false;
     }
 
+    /**
+     * X-Forwarded-For lo puede mandar cualquier cliente — solo es confiable si
+     * hay un proxy/load balancer de confianza delante que lo sobrescribe antes
+     * de que la petición llegue aquí. Sin esa garantía (trustProxyHeaders=false,
+     * valor por defecto), usar ese header permitiría evadir el rate limiter
+     * mandando un valor distinto en cada intento, así que se ignora y se usa
+     * siempre la IP real de la conexión TCP.
+     */
     private String resolveClientIp(HttpServletRequest request) {
-        String xff = request.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) {
-            return xff.split(",")[0].trim();
+        if (trustProxyHeaders) {
+            String xff = request.getHeader("X-Forwarded-For");
+            if (xff != null && !xff.isBlank()) {
+                return xff.split(",")[0].trim();
+            }
         }
         return request.getRemoteAddr();
     }
