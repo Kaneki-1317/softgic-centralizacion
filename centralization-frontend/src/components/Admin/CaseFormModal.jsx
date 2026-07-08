@@ -68,15 +68,38 @@ const LIST_FIELDS = {
   laboratorio: "idsLaboratorios",
 };
 
+// Comparación tolerante a mayúsculas/minúsculas y espacios — la IA no
+// garantiza que el nombre detectado coincida byte a byte con el catálogo.
+function normalizeLabel(value) {
+  return (value ?? "").trim().toLowerCase();
+}
+
+function findCatalogMatch(name, catalogItems) {
+  const target = normalizeLabel(name);
+  return catalogItems.find((item) => normalizeLabel(item.label) === target);
+}
+
+// Para cada nombre detectado por la IA, indica si ya existe en el catálogo
+// (matched=true, ya viene seleccionado en el selector de abajo) o si aún no
+// existe (matched=false, la Card ofrece un botón "Crear" para darlo de alta).
+function buildAiChips(aiNames, catalogItems) {
+  if (!aiNames) return [];
+  return aiNames.map((label) => ({ label, matched: !!findCatalogMatch(label, catalogItems) }));
+}
+
 // Resuelve la forma "externa" (nombre de tipo + labels de tecnologías/
 // categorías/laboratorios) hacia la forma interna del formulario (IDs).
 // La usan tanto initialData (edición) como prefillData (creación desde
 // documento) — misma lógica, misma resolución, para no duplicarla.
 function buildFormFromExternalShape(source, tiposCasos, tecnologias, categorias, laboratorios) {
   const tipoId = tiposCasos.find((t) => t.nombreTipo === source.tipoCaso)?.id ?? "";
-  const tecIds = tecnologias.filter((t) => source.tecnologias?.includes(t.label)).map((t) => t.id);
-  const catIds = categorias.filter((c) => source.categorias?.includes(c.label)).map((c) => c.id);
-  const labIds = laboratorios.filter((l) => source.laboratorios?.includes(l.label)).map((l) => l.id);
+  const namesToIds = (names, catalogItems) =>
+    (names || [])
+      .map((name) => findCatalogMatch(name, catalogItems)?.id)
+      .filter((id) => id !== undefined);
+  const tecIds = namesToIds(source.tecnologias, tecnologias);
+  const catIds = namesToIds(source.categorias, categorias);
+  const labIds = namesToIds(source.laboratorios, laboratorios);
 
   return {
     titulo:             source.titulo ?? "",
@@ -174,6 +197,13 @@ export default function CaseFormModal({
 
   const [confirmDelete, setConfirmDelete] = useState({
     open: false, type: null, item: null, loading: false,
+  });
+
+  // Nombres detectados por IA que el usuario está creando en el catálogo
+  // desde el chip "+ Crear" (uno por tipo, para no cruzar estados entre
+  // Tecnologías/Áreas/Equipos si comparten algún nombre).
+  const [creatingAiItems, setCreatingAiItems] = useState({
+    tecnologia: new Set(), categoria: new Set(), laboratorio: new Set(),
   });
 
   // Sync local lists whenever parent updates them
@@ -290,6 +320,39 @@ export default function CaseFormModal({
     }
   }
 
+  // Crea en el catálogo un nombre detectado por la IA que todavía no existe,
+  // y lo selecciona automáticamente — mismo endpoint/config que el
+  // quick-create manual, sin el modal intermedio porque el nombre ya se conoce.
+  async function handleCreateFromAi(type, name) {
+    const config = QUICK_CONFIG[type];
+    const setterMap = { tecnologia: setLocalTecs, categoria: setLocalCats, laboratorio: setLocalLabs };
+    const setter = setterMap[type];
+
+    setCreatingAiItems((prev) => ({ ...prev, [type]: new Set(prev[type]).add(name) }));
+
+    try {
+      const payload = { [config.nameField]: name };
+      const response = await api.post(config.endpoint, payload);
+      const newItem = { id: response.data.id, label: response.data[config.nameField] };
+
+      setter((prev) => [...prev, newItem]);
+      setForm((prev) => ({ ...prev, [config.listField]: [...prev[config.listField], newItem.id] }));
+      onMetadataCreated?.(type, newItem);
+      showToast(`"${newItem.label}" creado correctamente`, "success");
+    } catch (err) {
+      const msg = err.response?.status === 409
+        ? "Ya existe un registro con ese nombre"
+        : err.friendlyMessage || "Error al crear. Intenta de nuevo";
+      showToast(msg, "error");
+    } finally {
+      setCreatingAiItems((prev) => {
+        const next = new Set(prev[type]);
+        next.delete(name);
+        return { ...prev, [type]: next };
+      });
+    }
+  }
+
   // ── Delete-mode handlers ─────────────────────────────────────────────────────
 
   function toggleDeleteMode(type) {
@@ -328,10 +391,17 @@ export default function CaseFormModal({
     }
   }
 
+  // Recalculado en cada render a partir del catálogo actual — apenas se crea
+  // un pendiente (handleCreateFromAi) el propio catálogo lo refleja y el chip
+  // pasa de "pendiente" a "coincidido" sin estado adicional que sincronizar.
+  const aiTecChips = buildAiChips(prefillData?.tecnologias, localTecs);
+  const aiCatChips = buildAiChips(prefillData?.categorias, localCats);
+  const aiLabChips = buildAiChips(prefillData?.laboratorios, localLabs);
+
   // ── Render ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay">
       <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
 
         <button className="modal-close" onClick={onClose}>&#10005;</button>
@@ -453,7 +523,9 @@ export default function CaseFormModal({
             <SelectionCard
               icon={<Settings2 size={13} />}
               title="Tecnologías"
-              aiItems={prefillData?.tecnologias}
+              aiItems={aiTecChips}
+              onCreateAiItem={(name) => handleCreateFromAi("tecnologia", name)}
+              creatingLabels={creatingAiItems.tecnologia}
             >
               <div className="section-label-row">
                 <h4 className="modal-section-label">Tecnologías seleccionadas</h4>
@@ -480,7 +552,9 @@ export default function CaseFormModal({
             <SelectionCard
               icon={<LayoutList size={13} />}
               title="Área de aplicación"
-              aiItems={prefillData?.categorias}
+              aiItems={aiCatChips}
+              onCreateAiItem={(name) => handleCreateFromAi("categoria", name)}
+              creatingLabels={creatingAiItems.categoria}
             >
               <div className="section-label-row">
                 <h4 className="modal-section-label">Áreas seleccionadas</h4>
@@ -507,7 +581,9 @@ export default function CaseFormModal({
             <SelectionCard
               icon={<FlaskConical size={13} />}
               title="Equipo / Unidad"
-              aiItems={prefillData?.laboratorios}
+              aiItems={aiLabChips}
+              onCreateAiItem={(name) => handleCreateFromAi("laboratorio", name)}
+              creatingLabels={creatingAiItems.laboratorio}
             >
               <div className="section-label-row">
                 <h4 className="modal-section-label">Equipos seleccionados</h4>

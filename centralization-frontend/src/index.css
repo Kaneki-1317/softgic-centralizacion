@@ -817,14 +817,64 @@ nav a:hover {
 }
 
 .ai-chip {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 12.5px;
   font-weight: 500;
   font-family: 'Segoe UI', Inter, sans-serif;
+  line-height: 1.4;
+}
+
+.ai-chip-matched {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.ai-chip-check {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+/* Chip clickeable completo: el propio nombre de la categoría dispara la creación */
+.ai-chip-actionable {
+  appearance: none;
+  background: rgba(29, 78, 216, 0.06);
+  border: 1px dashed rgba(29, 78, 216, 0.35);
+  color: #1d4ed8;
+  cursor: pointer;
+  transition: background-color 240ms ease, border-color 240ms ease,
+    box-shadow 240ms ease, transform 240ms ease, color 240ms ease;
+}
+
+.ai-chip-actionable:hover:not(:disabled) {
+  background: rgba(29, 78, 216, 0.13);
+  border-color: rgba(29, 78, 216, 0.5);
+  border-style: solid;
+  box-shadow: 0 3px 10px rgba(29, 78, 216, 0.16);
+  transform: translateY(-1px);
+}
+
+.ai-chip-actionable:active:not(:disabled) {
+  background: rgba(29, 78, 216, 0.2);
+  border-style: solid;
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+.ai-chip-actionable:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.ai-chip-actionable:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ── Skeleton loading ── */
