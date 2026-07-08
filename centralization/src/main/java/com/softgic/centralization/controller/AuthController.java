@@ -2,6 +2,8 @@ package com.softgic.centralization.controller;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +25,8 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AdminRepository adminRepository;
     private final JwtUtil jwtUtil;
@@ -47,6 +51,7 @@ public class AuthController {
         String clientIp = resolveClientIp(httpRequest);
 
         if (rateLimiter.isBlocked(clientIp)) {
+            log.warn("Intento de inicio de sesión bloqueado por límite de intentos. IP: {}", clientIp);
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         }
 
@@ -54,6 +59,7 @@ public class AuthController {
 
         if (adminOpt.isEmpty()) {
             rateLimiter.recordFailure(clientIp);
+            log.warn("Intento de inicio de sesión fallido: correo no registrado ('{}').", request.getCorreo());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -61,11 +67,13 @@ public class AuthController {
 
         if (!checkAndMigratePassword(admin, request.getContrasena())) {
             rateLimiter.recordFailure(clientIp);
+            log.warn("Intento de inicio de sesión fallido: contraseña incorrecta para '{}'.", admin.getCorreo());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         rateLimiter.recordSuccess(clientIp);
         String token = jwtUtil.generateToken(admin.getCorreo(), admin.getName());
+        log.info("Usuario '{}' inició sesión correctamente.", admin.getCorreo());
         return ResponseEntity.ok(new LoginResponseDTO(admin.getName(), admin.getCorreo(), token));
     }
 

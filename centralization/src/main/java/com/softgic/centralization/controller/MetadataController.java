@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,8 @@ import com.softgic.centralization.repository.TipoCasoRepository;
 @RestController
 @RequestMapping("/api/v1")
 public class MetadataController {
+
+    private static final Logger log = LoggerFactory.getLogger(MetadataController.class);
 
     private final TipoCasoRepository tipoCasoRepository;
     private final TecnologiaRepository tecnologiaRepository;
@@ -91,7 +95,9 @@ public class MetadataController {
         }
         Tecnologia nueva = new Tecnologia();
         nueva.setNombreTecnologia(nombre);
-        return ResponseEntity.status(HttpStatus.CREATED).body(tecnologiaRepository.save(nueva));
+        Tecnologia guardada = tecnologiaRepository.save(nueva);
+        log.info("Tecnología creada correctamente. ID: {}, nombre: '{}'", guardada.getId(), guardada.getNombreTecnologia());
+        return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
     }
 
     @CacheEvict(value = "categorias", allEntries = true)
@@ -108,7 +114,9 @@ public class MetadataController {
         }
         Categoria nueva = new Categoria();
         nueva.setNombreCategoria(nombre);
-        return ResponseEntity.status(HttpStatus.CREATED).body(categoriaRepository.save(nueva));
+        Categoria guardada = categoriaRepository.save(nueva);
+        log.info("Categoría creada correctamente. ID: {}, nombre: '{}'", guardada.getId(), guardada.getNombreCategoria());
+        return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
     }
 
     @CacheEvict(value = "laboratorios", allEntries = true)
@@ -125,7 +133,9 @@ public class MetadataController {
         }
         Laboratorio nuevo = new Laboratorio();
         nuevo.setNombreLaboratorio(nombre);
-        return ResponseEntity.status(HttpStatus.CREATED).body(laboratorioRepository.save(nuevo));
+        Laboratorio guardado = laboratorioRepository.save(nuevo);
+        log.info("Equipo/unidad creado correctamente. ID: {}, nombre: '{}'", guardado.getId(), guardado.getNombreLaboratorio());
+        return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
     }
 
     // ── DELETE endpoints — protegidos, invalidan caché ─────────────────────────
@@ -141,6 +151,7 @@ public class MetadataController {
         // Un solo DELETE sobre la tabla de join — reemplaza el loop N+1
         casoRepository.deleteTecnologiaFromAllCasos(id);
         tecnologiaRepository.delete(opt.get());
+        log.info("Tecnología eliminada correctamente. ID: {}, nombre: '{}'", id, opt.get().getNombreTecnologia());
         return ResponseEntity.ok(Map.of("mensaje", "Tecnología eliminada correctamente"));
     }
 
@@ -154,6 +165,7 @@ public class MetadataController {
         }
         casoRepository.deleteCategoriaFromAllCasos(id);
         categoriaRepository.delete(opt.get());
+        log.info("Categoría eliminada correctamente. ID: {}, nombre: '{}'", id, opt.get().getNombreCategoria());
         return ResponseEntity.ok(Map.of("mensaje", "Categoría eliminada correctamente"));
     }
 
@@ -167,6 +179,7 @@ public class MetadataController {
         }
         casoRepository.deleteLaboratorioFromAllCasos(id);
         laboratorioRepository.delete(opt.get());
+        log.info("Equipo/unidad eliminado correctamente. ID: {}, nombre: '{}'", id, opt.get().getNombreLaboratorio());
         return ResponseEntity.ok(Map.of("mensaje", "Equipo / unidad eliminado correctamente"));
     }
 }

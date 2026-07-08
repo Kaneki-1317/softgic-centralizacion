@@ -3,6 +3,8 @@ package com.softgic.centralization.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,8 @@ import com.softgic.centralization.repository.TipoCasoRepository;
 
 @Service
 public class CasoServiceImpl implements CasoService {
+
+    private static final Logger log = LoggerFactory.getLogger(CasoServiceImpl.class);
 
     private final CasoRepository casoRepository;
     private final TipoCasoRepository tipoCasoRepository;
@@ -89,6 +93,7 @@ public class CasoServiceImpl implements CasoService {
         nuevoCaso.setLaboratorios(laboratorios);
 
         Caso casoGuardado = casoRepository.save(nuevoCaso);
+        log.info("Caso creado correctamente. ID: {}", casoGuardado.getId());
 
         return convertirEDto(casoGuardado);
     }
@@ -121,6 +126,7 @@ public class CasoServiceImpl implements CasoService {
         caso.setLaboratorios(laboratorios);
 
         Caso casoActualizado = casoRepository.save(caso);
+        log.info("Caso actualizado correctamente. ID: {}", casoActualizado.getId());
 
         return convertirEDto(casoActualizado);
     }
@@ -130,6 +136,7 @@ public class CasoServiceImpl implements CasoService {
         casoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Caso no encontrado con ID: " + id));
         casoRepository.deleteById(id);
+        log.info("Caso eliminado correctamente. ID: {}", id);
     }
 
     private CasoDTO convertirEDto(Caso caso) {
