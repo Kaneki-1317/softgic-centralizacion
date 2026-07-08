@@ -33,4 +33,7 @@ build/
 .vscode/
 
 ### Configuración local con credenciales — NO commitear ###
-src/main/resources/application-dev.properties
+### Cubre cualquier perfil local/futuro (dev, local, test, etc.).
+### application-prod.properties es una plantilla sin secretos y sí se versiona.
+src/main/resources/application-*.properties
+!src/main/resources/application-prod.properties
