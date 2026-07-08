@@ -2,6 +2,7 @@ package com.softgic.centralization.dto;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class CasoCrearDTO {
 
     private String resultados;
 
+    @Valid
     private List<RecursoDTO> recursos;
 
     @NotNull(message = "Debe seleccionar un tipo de caso")

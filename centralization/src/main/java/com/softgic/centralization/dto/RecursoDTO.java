@@ -1,9 +1,13 @@
 package com.softgic.centralization.dto;
 
+import com.softgic.centralization.util.ValidResourceUrl;
+
 public class RecursoDTO {
 
     private String tipo;   // PDF, PPT, XLSX, VIDEO, LINK
     private String nombre;
+
+    @ValidResourceUrl
     private String url;
 
     public RecursoDTO() {}

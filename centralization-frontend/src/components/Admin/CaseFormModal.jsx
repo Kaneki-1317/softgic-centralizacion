@@ -68,6 +68,19 @@ const LIST_FIELDS = {
   laboratorio: "idsLaboratorios",
 };
 
+// Valida que la URL de un recurso use esquema http/https antes de enviarla —
+// es solo una mejora de UX; el backend revalida lo mismo y es la fuente de
+// verdad (ver ValidResourceUrl/ResourceUrlValidator en el backend).
+const SAFE_URL_SCHEMES = new Set(["http:", "https:"]);
+
+function isSafeResourceUrl(url) {
+  try {
+    return SAFE_URL_SCHEMES.has(new URL(url.trim()).protocol);
+  } catch {
+    return false;
+  }
+}
+
 // Comparación tolerante a mayúsculas/minúsculas y espacios — la IA no
 // garantiza que el nombre detectado coincida byte a byte con el catálogo.
 function normalizeLabel(value) {
@@ -258,6 +271,15 @@ export default function CaseFormModal({
     const recursos = form.recursos
       .filter((d) => d.url?.trim())
       .map((d) => ({ tipo: d.tipo, nombre: d.nombre.trim() || d.tipo, url: d.url.trim() }));
+
+    const recursoInvalido = recursos.find((r) => !isSafeResourceUrl(r.url));
+    if (recursoInvalido) {
+      showToast(
+        `La URL de "${recursoInvalido.nombre}" no es válida. Debe iniciar con http:// o https://`,
+        "error"
+      );
+      return;
+    }
 
     onSave({
       titulo:             form.titulo,
