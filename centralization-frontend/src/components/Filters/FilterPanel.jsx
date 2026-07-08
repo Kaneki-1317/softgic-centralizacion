@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import SelectFilter from "./SelectFilter";
 
 export default function FilterPanel({
@@ -10,6 +11,17 @@ export default function FilterPanel({
 }) {
   const activeCount = Object.values(filters).filter(Boolean).length;
 
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   return (
     <>
       {open && (
@@ -21,6 +33,7 @@ export default function FilterPanel({
         role="dialog"
         aria-modal={open}
         aria-labelledby="filter-drawer-title"
+        inert={!open}
       >
         <div className="drawer-header">
           <div className="drawer-header-left">

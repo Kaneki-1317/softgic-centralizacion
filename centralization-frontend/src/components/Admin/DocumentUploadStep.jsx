@@ -77,6 +77,12 @@ export default function DocumentUploadStep({ entries, onEntriesChange, onAnalyze
         onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
         role="button"
         tabIndex={0}
       >

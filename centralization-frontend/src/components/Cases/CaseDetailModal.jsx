@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { AlertTriangle, Settings2, LayoutList, FlaskConical, Building2, CalendarCheck, ExternalLink, TrendingUp, FileText, Paperclip } from "lucide-react";
 
 const DOC_META = {
@@ -8,6 +9,17 @@ const DOC_META = {
 };
 
 export default function CaseDetailModal({ item, onClose }) {
+  useEffect(() => {
+    if (!item) return;
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onClose();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [item, onClose]);
+
   if (!item) return null;
 
   return (

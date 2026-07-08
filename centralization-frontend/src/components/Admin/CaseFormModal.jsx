@@ -246,6 +246,31 @@ export default function CaseFormModal({
     setDeleteMode({ tecnologia: false, categoria: false, laboratorio: false });
   }, [open, initialData, prefillData]);
 
+  // Cierra con Escape. El sub-modal visible tiene prioridad sobre el
+  // formulario principal, para no perder el progreso del caso por accidente
+  // si el usuario solo quería cerrar "crear rápido" o "confirmar eliminar".
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(e) {
+      if (e.key !== "Escape") return;
+      if (confirmDelete.open) {
+        cancelDelete();
+      } else if (quickCreate.open) {
+        closeQuickCreate();
+      } else {
+        onClose();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+    // Se omiten onClose/cancelDelete/closeQuickCreate a propósito: son
+    // funciones redefinidas en cada render que no cambian de comportamiento,
+    // envolverlas en useCallback está fuera del alcance de esta tarea.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, confirmDelete.open, quickCreate.open]);
+
   if (!open) return null;
 
   // ── Documento helpers ────────────────────────────────────────────────────────

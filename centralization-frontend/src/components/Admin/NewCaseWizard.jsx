@@ -62,6 +62,16 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
     onClose();
   }
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === "Escape") handleClose();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleAnalyze() {
     const validFiles = fileEntries.filter((e) => e.validation.valid).map((e) => e.file);
     if (validFiles.length === 0) return;

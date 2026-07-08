@@ -1,6 +1,18 @@
+import { useEffect } from "react";
 import { Trash2 } from "lucide-react";
 
 export default function ConfirmModal({ open, onConfirm, onCancel }) {
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") onCancel();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onCancel]);
+
   if (!open) return null;
 
   return (
