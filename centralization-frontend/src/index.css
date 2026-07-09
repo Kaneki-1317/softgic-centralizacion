@@ -27,12 +27,6 @@
   font-size: 16px;
 }
 
-.social-label {
-  font-size: 13px;
-  margin-right: 4px;
-  color: #ffffff;
-}
-
 .gptw-badge {
   padding: 5px 14px;
   border-radius: 20px;
@@ -49,23 +43,6 @@
 
 .brand img {
   filter: brightness(0) invert(1);
-}
-
-nav {
-  display: flex;
-  gap: 5.5rem;
-}
-
-nav a {
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
-}
-
-nav a:hover {
-  opacity: 0.75;
 }
 
 .hero-section {
@@ -688,14 +665,6 @@ nav a:hover {
   color: #1a1a2e;
   line-height: 1.25;
   padding-right: 36px;
-}
-
-.modal-date {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #737373;
 }
 
 /* Body */
@@ -1858,26 +1827,6 @@ body::-webkit-scrollbar-corner,
   font-weight: 600;
 }
 
-/* ── Modal: link a documento externo ── */
-.modal-doc-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #008AAB;
-  color: #ffffff;
-  border-radius: 20px;
-  padding: 9px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: opacity 0.2s;
-  align-self: flex-start;
-}
-
-.modal-doc-link:hover {
-  opacity: 0.85;
-}
-
 /* ── Section label row (label + "Nueva" button) ── */
 .section-label-row {
   display: flex;
@@ -2081,10 +2030,6 @@ body::-webkit-scrollbar-corner,
     gap: 2rem;
   }
 
-  nav {
-    gap: 2.5rem;
-  }
-
   .search-input {
     width: 220px;
   }
@@ -2108,11 +2053,6 @@ body::-webkit-scrollbar-corner,
     flex-wrap: wrap;
     gap: 12px;
     padding: 10px 0 14px;
-  }
-
-  nav {
-    gap: 1.2rem;
-    flex-wrap: wrap;
   }
 
   .hero-section {
