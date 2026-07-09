@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
 import {
   Routes,
@@ -6,9 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import PublicPage from "./pages/PublicPage";
-import LoginPage from "./pages/LoginPage";
-import AdminPage from "./pages/AdminPage";
+// Code splitting: cada página se descarga en su propio chunk, solo cuando la
+// ruta correspondiente se visita — un visitante público nunca descarga el
+// bundle del panel admin, y viceversa.
+const PublicPage = lazy(() => import("./pages/PublicPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
 
 import {
   useAuth,
@@ -47,32 +50,34 @@ export default function App() {
     <>
       <ToastViewport />
 
-      <Routes>
+      <Suspense fallback={null}>
+        <Routes>
 
-        <Route
-          path="/"
-          element={<PublicPage />}
-        />
+          <Route
+            path="/"
+            element={<PublicPage />}
+          />
 
-        <Route
-          path="/softgic-access-portal/login"
-          element={
-            <GuestRoute>
-              <LoginPage />
-            </GuestRoute>
-          }
-        />
+          <Route
+            path="/softgic-access-portal/login"
+            element={
+              <GuestRoute>
+                <LoginPage />
+              </GuestRoute>
+            }
+          />
 
-        <Route
-          path="/softgic-access-portal/:adminName"
-          element={
-            <PrivateRoute>
-              <AdminPage />
-            </PrivateRoute>
-          }
-        />
+          <Route
+            path="/softgic-access-portal/:adminName"
+            element={
+              <PrivateRoute>
+                <AdminPage />
+              </PrivateRoute>
+            }
+          />
 
-      </Routes>
+        </Routes>
+      </Suspense>
     </>
   );
 }
