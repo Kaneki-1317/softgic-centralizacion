@@ -865,11 +865,8 @@ nav a:hover {
   transform: translateY(0);
 }
 
-.ai-chip-actionable:focus-visible {
-  outline: 2px solid #0d2d6b;
-  outline-offset: 2px;
-}
-
+/* :focus-visible ya lo cubre la regla global de "FOCO VISIBLE" al final del
+   archivo (mismos valores) — .ai-chip-actionable siempre es un <button>. */
 .ai-chip-actionable:disabled {
   opacity: 0.55;
   cursor: default;
