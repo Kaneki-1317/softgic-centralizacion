@@ -2,8 +2,11 @@ package com.softgic.centralization.specification;
 
 import com.softgic.centralization.model.Caso;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -21,33 +24,12 @@ public class CasoSpecification {
             if (search != null && !search.isBlank()) {
                 String like = "%" + search.toLowerCase() + "%";
 
-                Subquery<Long> techSub = query.subquery(Long.class);
-                var techRoot = techSub.from(Caso.class);
-                var techJoin = techRoot.join("tecnologias");
-                techSub.select(techRoot.get("id"))
-                        .where(cb.equal(techRoot.get("id"), root.get("id")),
-                               cb.like(cb.lower(techJoin.get("nombreTecnologia")), like));
-
-                Subquery<Long> catSub = query.subquery(Long.class);
-                var catRoot = catSub.from(Caso.class);
-                var catJoin = catRoot.join("categorias");
-                catSub.select(catRoot.get("id"))
-                        .where(cb.equal(catRoot.get("id"), root.get("id")),
-                               cb.like(cb.lower(catJoin.get("nombreCategoria")), like));
-
-                Subquery<Long> labSub = query.subquery(Long.class);
-                var labRoot = labSub.from(Caso.class);
-                var labJoin = labRoot.join("laboratorios");
-                labSub.select(labRoot.get("id"))
-                        .where(cb.equal(labRoot.get("id"), root.get("id")),
-                               cb.like(cb.lower(labJoin.get("nombreLaboratorio")), like));
-
                 predicates.add(cb.or(
                         cb.like(cb.lower(root.get("titulo")), like),
                         cb.like(cb.lower(root.get("reto")), like),
-                        cb.exists(techSub),
-                        cb.exists(catSub),
-                        cb.exists(labSub)
+                        existsRelatedMatch(cb, query, root, "tecnologias", "nombreTecnologia", like),
+                        existsRelatedMatch(cb, query, root, "categorias", "nombreCategoria", like),
+                        existsRelatedMatch(cb, query, root, "laboratorios", "nombreLaboratorio", like)
                 ));
             }
             if (tipo != null && !tipo.isBlank()) {
@@ -73,5 +55,25 @@ public class CasoSpecification {
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    // Las 3 llamadas de arriba armaban una subconsulta EXISTS idéntica salvo
+    // la relación y el campo — mismo SQL generado (misma subconsulta
+    // correlacionada por id, mismo LIKE), solo se elimina la duplicación.
+    // EXISTS se mantiene deliberadamente en vez de un LEFT JOIN + distinct:
+    // con 3 relaciones many-to-many combinadas, un LEFT JOIN triple puede
+    // multiplicar las filas por caso (producto cartesiano) antes de
+    // deduplicar, mientras que EXISTS no fanea filas — es la opción más
+    // eficiente para "¿existe al menos una coincidencia?".
+    private static Predicate existsRelatedMatch(
+            CriteriaBuilder cb, CriteriaQuery<?> query, Root<Caso> root,
+            String relation, String field, String like) {
+        Subquery<Long> sub = query.subquery(Long.class);
+        var subRoot = sub.from(Caso.class);
+        var join = subRoot.join(relation);
+        sub.select(subRoot.get("id"))
+                .where(cb.equal(subRoot.get("id"), root.get("id")),
+                       cb.like(cb.lower(join.get(field)), like));
+        return cb.exists(sub);
     }
 }
