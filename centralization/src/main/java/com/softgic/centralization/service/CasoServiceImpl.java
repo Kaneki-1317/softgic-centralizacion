@@ -70,27 +70,7 @@ public class CasoServiceImpl implements CasoService {
     @Override
     public CasoDTO crearCaso(CasoCrearDTO casoCrearDTO) {
         Caso nuevoCaso = new Caso();
-        nuevoCaso.setTitulo(casoCrearDTO.getTitulo());
-        nuevoCaso.setSector(casoCrearDTO.getSector());
-        nuevoCaso.setCliente(casoCrearDTO.getCliente());
-        nuevoCaso.setAnioImplementacion(casoCrearDTO.getAnioImplementacion());
-        nuevoCaso.setBeneficioPrincipal(casoCrearDTO.getBeneficioPrincipal());
-        nuevoCaso.setReto(casoCrearDTO.getReto());
-        nuevoCaso.setResultados(casoCrearDTO.getResultados());
-        nuevoCaso.setRecursos(casoCrearDTO.getRecursos());
-
-        TipoCaso tipo = tipoCasoRepository.findById(casoCrearDTO.getIdTipoCaso())
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de caso no encontrado con ID: " + casoCrearDTO.getIdTipoCaso()));
-        nuevoCaso.setTipoCaso(tipo);
-
-        List<Tecnologia> tecnologias = tecnologiaRepository.findAllById(casoCrearDTO.getIdsTecnologias());
-        nuevoCaso.setTecnologias(tecnologias);
-
-        List<Categoria> categorias = categoriaRepository.findAllById(casoCrearDTO.getIdsCategorias());
-        nuevoCaso.setCategorias(categorias);
-
-        List<Laboratorio> laboratorios = laboratorioRepository.findAllById(casoCrearDTO.getIdsLaboratorios());
-        nuevoCaso.setLaboratorios(laboratorios);
+        aplicarDatos(nuevoCaso, casoCrearDTO);
 
         Caso casoGuardado = casoRepository.save(nuevoCaso);
         log.info("Caso creado correctamente. ID: {}", casoGuardado.getId());
@@ -103,6 +83,18 @@ public class CasoServiceImpl implements CasoService {
         Caso caso = casoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Caso no encontrado con ID: " + id));
 
+        aplicarDatos(caso, casoCrearDTO);
+
+        Caso casoActualizado = casoRepository.save(caso);
+        log.info("Caso actualizado correctamente. ID: {}", casoActualizado.getId());
+
+        return convertirEDto(casoActualizado);
+    }
+
+    // crearCaso y actualizarCaso aplicaban el mismo bloque de asignación de
+    // campos y resolución de relaciones desde CasoCrearDTO — mismo origen,
+    // mismo destino (Caso), solo cambiaba si el Caso era nuevo o existente.
+    private void aplicarDatos(Caso caso, CasoCrearDTO casoCrearDTO) {
         caso.setTitulo(casoCrearDTO.getTitulo());
         caso.setSector(casoCrearDTO.getSector());
         caso.setCliente(casoCrearDTO.getCliente());
@@ -124,11 +116,6 @@ public class CasoServiceImpl implements CasoService {
 
         List<Laboratorio> laboratorios = laboratorioRepository.findAllById(casoCrearDTO.getIdsLaboratorios());
         caso.setLaboratorios(laboratorios);
-
-        Caso casoActualizado = casoRepository.save(caso);
-        log.info("Caso actualizado correctamente. ID: {}", casoActualizado.getId());
-
-        return convertirEDto(casoActualizado);
     }
 
     @Override
