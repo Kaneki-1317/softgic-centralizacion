@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /softgic-access-portal/
+
+# TODO: reemplazar por el dominio real de producción antes de publicar
+Sitemap: https://REEMPLAZAR-CON-TU-DOMINIO.com/sitemap.xml
