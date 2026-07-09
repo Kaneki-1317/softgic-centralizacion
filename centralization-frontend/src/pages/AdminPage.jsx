@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import AdminNavbar from "../components/Navbar/AdminNavbar";
 import FilterPanel from "../components/Filters/FilterPanel";
-import AdminCaseCard from "../components/Admin/AdminCaseCard";
+import CaseCard from "../components/Cases/CaseCard";
 import CaseDetailModal from "../components/Cases/CaseDetailModal";
 import CaseFormModal from "../components/Admin/CaseFormModal";
 import NewCaseWizard from "../components/Admin/NewCaseWizard";
@@ -287,7 +287,7 @@ export default function AdminPage() {
             <>
               <div className="case-grid">
                 {cases.map((item) => (
-                  <AdminCaseCard
+                  <CaseCard
                     key={item.id}
                     item={item}
                     onOpen={() => setSelectedCase(item)}

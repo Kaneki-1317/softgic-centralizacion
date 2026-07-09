@@ -1,6 +1,11 @@
-import { Building2, CalendarCheck } from "lucide-react";
+import { Pencil, Trash2, Building2, CalendarCheck } from "lucide-react";
 
-export default function CaseCard({ item, onOpen }) {
+// onEdit/onDelete son opcionales: si no se pasan (uso público), se muestra
+// solo "Ver caso"; si se pasan (uso admin), se muestran también Editar y
+// Eliminar — mismo componente, mismo markup que antes tenían por separado
+// CaseCard y AdminCaseCard, sin ninguna diferencia visual entre ambos usos.
+export default function CaseCard({ item, onOpen, onEdit, onDelete }) {
+  const isAdmin = !!(onEdit || onDelete);
   const tags = [
     ...(item.tecnologias || []),
     ...(item.categorias  || []),
@@ -47,9 +52,23 @@ export default function CaseCard({ item, onOpen }) {
         </div>
       )}
 
-      <button className="card-action-btn" onClick={onOpen}>
-        Ver caso
-      </button>
+      {isAdmin ? (
+        <div className="card-actions-row">
+          <button className="card-action-btn" onClick={onOpen}>
+            Ver caso
+          </button>
+          <button className="card-edit-btn" onClick={() => onEdit(item)}>
+            <Pencil size={14} /> Editar
+          </button>
+          <button className="card-delete-btn" onClick={() => onDelete(item.id)}>
+            <Trash2 size={14} /> Eliminar
+          </button>
+        </div>
+      ) : (
+        <button className="card-action-btn" onClick={onOpen}>
+          Ver caso
+        </button>
+      )}
     </article>
   );
 }
