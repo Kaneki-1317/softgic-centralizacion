@@ -173,7 +173,7 @@ nav a:hover {
 }
 
 .search-input::placeholder {
-  color: #9aa3b0;
+  color: #717781;
 }
 
 .search-btn {
@@ -450,7 +450,7 @@ nav a:hover {
 /* ── Results counter ── */
 .results-counter {
   font-size: 13px;
-  color: #888;
+  color: #737373;
   margin-bottom: 12px;
   font-family: 'Segoe UI', Inter, sans-serif;
 }
@@ -468,7 +468,7 @@ nav a:hover {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: #999;
+  color: #737373;
   margin-left: auto;
 }
 
@@ -552,7 +552,7 @@ nav a:hover {
 .admin-toolbar-label {
   font-size: 13px;
   font-weight: 600;
-  color: #888;
+  color: #737373;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -695,7 +695,7 @@ nav a:hover {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #888;
+  color: #737373;
 }
 
 /* Body */
@@ -918,7 +918,7 @@ nav a:hover {
   gap: 12px;
   padding: 72px 24px;
   text-align: center;
-  color: #aaa;
+  color: #737373;
 }
 
 .empty-state svg {
@@ -933,7 +933,7 @@ nav a:hover {
 
 .empty-state p {
   font-size: 14px;
-  color: #888;
+  color: #737373;
   max-width: 340px;
   line-height: 1.55;
 }
@@ -968,7 +968,7 @@ nav a:hover {
 
 .footer-tagline {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.5);
   line-height: 1.5;
   margin-top: 12px;
   max-width: 160px;
@@ -1031,7 +1031,7 @@ nav a:hover {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .footer-cta-site {
@@ -1064,7 +1064,7 @@ nav a:hover {
 
 .footer-bottom p {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 /* ── Pagination disabled ── */
@@ -1225,7 +1225,7 @@ nav a:hover {
 
 .login-card-header p {
   font-size: 13px;
-  color: #888;
+  color: #737373;
 }
 
 .login-fields {
@@ -1255,7 +1255,7 @@ nav a:hover {
 .login-input-icon {
   position: absolute;
   left: 14px;
-  color: #aaa;
+  color: #737373;
   pointer-events: none;
 }
 
@@ -1353,7 +1353,7 @@ nav a:hover {
 
 .confirm-panel p {
   font-size: 13px;
-  color: #888;
+  color: #737373;
   margin-bottom: 8px;
 }
 
@@ -1402,7 +1402,7 @@ nav a:hover {
 }
 
 .form-title-input::placeholder {
-  color: #c0c4ce;
+  color: #74767c;
 }
 
 .form-textarea {
@@ -1439,7 +1439,7 @@ nav a:hover {
 }
 
 .form-textarea-ghost::placeholder {
-  color: #6ee7b7;
+  color: #3f8368;
   font-style: normal;
 }
 
@@ -1558,7 +1558,7 @@ nav a:hover {
 
 .docs-hint {
   font-size: 12px;
-  color: #999;
+  color: #737373;
   margin-bottom: 14px;
   margin-top: 2px;
 }
@@ -1569,7 +1569,7 @@ nav a:hover {
   align-items: center;
   gap: 8px;
   padding: 28px 0;
-  color: #c8d0dc;
+  color: #6f747b;
   font-size: 13px;
 }
 
@@ -1704,7 +1704,7 @@ nav a:hover {
 }
 
 .modal-recurso-arrow {
-  color: #bbb;
+  color: #737373;
   flex-shrink: 0;
   transition: color 0.2s;
 }
@@ -1792,7 +1792,7 @@ body::-webkit-scrollbar-corner,
 }
 
 .form-input::placeholder {
-  color: #b8bcc8;
+  color: #72747b;
 }
 
 /* ── Card: sector + año a la derecha del meta row ── */
@@ -1852,7 +1852,7 @@ body::-webkit-scrollbar-corner,
 /* ── Modal: texto del cliente ── */
 .modal-client {
   font-size: 13px;
-  color: #777;
+  color: #737373;
   margin: 0;
 }
 
@@ -1972,7 +1972,7 @@ body::-webkit-scrollbar-corner,
 
 .quick-create-error {
   font-size: 12.5px;
-  color: #dc2626;
+  color: #c0392b;
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 8px;
@@ -2373,7 +2373,7 @@ body::-webkit-scrollbar-corner,
 
 .upload-dropzone-hint {
   font-size: 12px;
-  color: #999;
+  color: #737373;
 }
 
 .upload-input-hidden {
@@ -2406,7 +2406,7 @@ body::-webkit-scrollbar-corner,
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #999;
+  color: #737373;
 }
 
 .upload-file-row.status-error {
@@ -2433,11 +2433,11 @@ body::-webkit-scrollbar-corner,
   gap: 5px;
   font-size: 12px;
   font-weight: 600;
-  color: #16a34a;
+  color: #15803d;
 }
 
 .upload-file-row.status-error .upload-file-status-pill {
-  color: #d93025;
+  color: #c0392b;
 }
 
 .upload-file-remove-btn {
@@ -2486,7 +2486,7 @@ body::-webkit-scrollbar-corner,
 
 .analysis-progress-subtitle {
   font-size: 13px;
-  color: #888;
+  color: #737373;
   margin-bottom: 14px;
 }
 
@@ -2508,7 +2508,7 @@ body::-webkit-scrollbar-corner,
 }
 
 .analysis-progress-item.done {
-  color: #16a34a;
+  color: #15803d;
 }
 
 .analysis-progress-item.active {
@@ -2518,7 +2518,7 @@ body::-webkit-scrollbar-corner,
 }
 
 .analysis-progress-item.pending {
-  color: #c8d0dc;
+  color: #6f747b;
 }
 
 .analysis-progress-icon {
