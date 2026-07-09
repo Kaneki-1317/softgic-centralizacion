@@ -19,6 +19,7 @@ import com.softgic.centralization.dto.PaginatedCasoDTO;
 import com.softgic.centralization.service.CasoService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 
 @RestController
 @RequestMapping("/api/v1/casos")
@@ -34,7 +35,7 @@ public class CasoController {
     @GetMapping
     public ResponseEntity<PaginatedCasoDTO> obtenerCasosPaginados(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "10") @Max(value = 100, message = "El tamaño de página no puede superar 100") int size,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String tipo,
             @RequestParam(required = false) String tecnologia,

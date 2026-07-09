@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.softgic.centralization.dto.ErrorResponseDTO;
 import com.softgic.centralization.exception.N8nIntegrationException;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -34,6 +37,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
+                .findFirst()
+                .orElse("Error de validación");
+
+        return ResponseEntity.badRequest().body(new ErrorResponseDTO(
+                LocalDateTime.now().toString(),
+                HttpStatus.BAD_REQUEST.value(),
+                "VALIDATION_ERROR",
+                message));
+    }
+
+    // Violaciones de @Validated sobre @RequestParam/@PathVariable (ej. límite
+    // máximo de tamaño de página) — MethodArgumentNotValidException solo cubre
+    // @Valid @RequestBody, esta es la que lanza Spring para parámetros sueltos.
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleConstraintViolation(ConstraintViolationException ex) {
+        String message = ex.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
                 .findFirst()
                 .orElse("Error de validación");
 
