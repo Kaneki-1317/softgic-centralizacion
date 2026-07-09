@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SearchX } from "lucide-react";
 
 import PublicNavbar from "../components/Navbar/PublicNavbar";
@@ -8,105 +8,29 @@ import CaseDetailModal from "../components/Cases/CaseDetailModal";
 import CaseSkeletons from "../components/Cases/CaseSkeletons";
 import Footer from "../components/Shared/Footer";
 
-import { useToast } from "../context/ToastContext";
-import api from "../services/api";
+import { useCaseFeed } from "../hooks/useCaseFeed";
 
 export default function PublicPage() {
-  const { showToast } = useToast();
-
-  const [cases, setCases] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCase, setSelectedCase] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const [metadata, setMetadata] = useState({
-    tipos: [], tecnologias: [], categorias: [], laboratorios: [],
+  const {
+    cases,
+    loading,
+    metadata,
+    pagination,
+    searchInput,
+    setSearchInput,
+    filters,
+    activeFilterCount,
+    handleSearchSubmit,
+    handleFilterChange,
+    handlePageChange,
+    handleClear,
+  } = useCaseFeed({
+    loadCasesErrorMessage: "Error al cargar los datos",
+    loadMetadataErrorMessage: "Error al cargar los datos",
   });
-
-  const [pagination, setPagination] = useState({
-    paginaActual: 0, totalPaginas: 0, totalElementos: 0,
-  });
-
-  const [searchInput, setSearchInput] = useState("");
-  const [submittedSearch, setSubmittedSearch] = useState("");
-
-  const [filters, setFilters] = useState({
-    tipo: "", tecnologia: "", categoria: "", laboratorio: "",
-  });
-
-  useEffect(() => {
-    loadCases(0, "", { tipo: "", tecnologia: "", categoria: "", laboratorio: "" });
-    loadMetadata();
-  }, []);
-
-  async function loadCases(page, search, activeFilters) {
-    try {
-      setLoading(true);
-      const params = { page, size: 10 };
-      if (search) params.search = search;
-      if (activeFilters.tipo)        params.tipo        = activeFilters.tipo;
-      if (activeFilters.tecnologia)  params.tecnologia  = activeFilters.tecnologia;
-      if (activeFilters.categoria)   params.categoria   = activeFilters.categoria;
-      if (activeFilters.laboratorio) params.laboratorio = activeFilters.laboratorio;
-
-      const response = await api.get("/casos", { params });
-      setCases(response.data.content);
-      setPagination({
-        paginaActual:   response.data.paginaActual,
-        totalPaginas:   response.data.totalPaginas,
-        totalElementos: response.data.totalElementos,
-      });
-    } catch (error) {
-      console.error(error);
-      showToast("Error al cargar los datos", "error");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadMetadata() {
-    try {
-      const [tipos, tecs, cats, labs] = await Promise.all([
-        api.get("/tipos-casos"),
-        api.get("/tecnologias"),
-        api.get("/categorias"),
-        api.get("/laboratorios"),
-      ]);
-      setMetadata({
-        tipos:        tipos.data.map((t) => ({ id: t.id, label: t.nombreTipo })),
-        tecnologias:  tecs.data.map((t)  => ({ id: t.id, label: t.nombreTecnologia })),
-        categorias:   cats.data.map((c)  => ({ id: c.id, label: c.nombreCategoria })),
-        laboratorios: labs.data.map((l)  => ({ id: l.id, label: l.nombreLaboratorio })),
-      });
-    } catch (error) {
-      console.error(error);
-      showToast("Error al cargar los datos", "error");
-    }
-  }
-
-  function handleSearchSubmit() {
-    setSubmittedSearch(searchInput);
-    loadCases(0, searchInput, filters);
-  }
-
-  function handleFilterChange(newFilters) {
-    setFilters(newFilters);
-    loadCases(0, submittedSearch, newFilters);
-  }
-
-  function handlePageChange(newPage) {
-    loadCases(newPage, submittedSearch, filters);
-  }
-
-  function handleClear() {
-    const empty = { tipo: "", tecnologia: "", categoria: "", laboratorio: "" };
-    setSearchInput("");
-    setSubmittedSearch("");
-    setFilters(empty);
-    loadCases(0, "", empty);
-  }
-
-  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   return (
     <>

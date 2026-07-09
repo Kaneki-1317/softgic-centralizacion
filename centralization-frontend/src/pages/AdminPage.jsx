@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SearchX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import ConfirmModal from "../components/Shared/ConfirmModal";
 
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { useCaseFeed } from "../hooks/useCaseFeed";
 import api from "../services/api";
 
 export default function AdminPage() {
@@ -20,8 +21,6 @@ export default function AdminPage() {
   const { logout } = useAuth();
   const { showToast } = useToast();
 
-  const [cases, setCases] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCase, setSelectedCase] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openModal, setOpenModal] = useState(false);
@@ -30,79 +29,22 @@ export default function AdminPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [prefillData, setPrefillData] = useState(null);
 
-  const [metadata, setMetadata] = useState({
-    tipos: [],
-    tecnologias: [],
-    categorias: [],
-    laboratorios: [],
-    tiposCasos: [],
-  });
-
-  const [pagination, setPagination] = useState({
-    paginaActual: 0,
-    totalPaginas: 0,
-    totalElementos: 0,
-  });
-
-  const [searchInput, setSearchInput] = useState("");
-  const [submittedSearch, setSubmittedSearch] = useState("");
-
-  const [filters, setFilters] = useState({
-    tipo: "",
-    tecnologia: "",
-    categoria: "",
-    laboratorio: "",
-  });
-
-  useEffect(() => {
-    loadCases(0, "", { tipo: "", tecnologia: "", categoria: "", laboratorio: "" });
-    loadMetadata();
-  }, []);
-
-  async function loadCases(page, search, activeFilters) {
-    try {
-      setLoading(true);
-      const params = { page, size: 10 };
-      if (search) params.search = search;
-      if (activeFilters?.tipo)        params.tipo        = activeFilters.tipo;
-      if (activeFilters?.tecnologia)  params.tecnologia  = activeFilters.tecnologia;
-      if (activeFilters?.categoria)   params.categoria   = activeFilters.categoria;
-      if (activeFilters?.laboratorio) params.laboratorio = activeFilters.laboratorio;
-      const response = await api.get("/casos", { params });
-      setCases(response.data.content);
-      setPagination({
-        paginaActual: response.data.paginaActual,
-        totalPaginas: response.data.totalPaginas,
-        totalElementos: response.data.totalElementos,
-      });
-    } catch (error) {
-      console.error(error);
-      showToast("Error al cargar los casos", "error");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadMetadata() {
-    try {
-      const [tipos, tecs, cats, labs] = await Promise.all([
-        api.get("/tipos-casos"),
-        api.get("/tecnologias"),
-        api.get("/categorias"),
-        api.get("/laboratorios"),
-      ]);
-      setMetadata({
-        tipos:        tipos.data.map((t) => ({ id: t.id, label: t.nombreTipo })),
-        tecnologias:  tecs.data.map((t)  => ({ id: t.id, label: t.nombreTecnologia })),
-        categorias:   cats.data.map((c)  => ({ id: c.id, label: c.nombreCategoria })),
-        laboratorios: labs.data.map((l)  => ({ id: l.id, label: l.nombreLaboratorio })),
-        tiposCasos:   tipos.data,
-      });
-    } catch (error) {
-      console.error(error);
-      showToast("Error al cargar la metadata", "error");
-    }
-  }
+  const {
+    cases,
+    loading,
+    metadata,
+    setMetadata,
+    pagination,
+    searchInput,
+    setSearchInput,
+    filters,
+    activeFilterCount,
+    handleSearchSubmit,
+    handleFilterChange,
+    handlePageChange,
+    handleClear,
+    reload,
+  } = useCaseFeed();
 
   async function saveCase(data) {
     const isEditing = !!editingCase;
@@ -117,7 +59,7 @@ export default function AdminPage() {
       setOpenModal(false);
       setEditingCase(null);
       setPrefillData(null);
-      loadCases(pagination.paginaActual, submittedSearch, filters);
+      reload();
     } catch (error) {
       console.error(error);
       showToast(isEditing ? "Error al actualizar" : "Error al crear", "error");
@@ -163,7 +105,7 @@ export default function AdminPage() {
     try {
       await api.delete(`/casos/${confirmId}`);
       showToast("Caso eliminado correctamente", "success");
-      loadCases(pagination.paginaActual, submittedSearch, filters);
+      reload();
     } catch (error) {
       console.error(error);
       showToast("Error al eliminar el caso", "error");
@@ -171,30 +113,6 @@ export default function AdminPage() {
       setConfirmId(null);
     }
   }
-
-  function handleSearchSubmit() {
-    setSubmittedSearch(searchInput);
-    loadCases(0, searchInput, filters);
-  }
-
-  function handleFilterChange(newFilters) {
-    setFilters(newFilters);
-    loadCases(0, submittedSearch, newFilters);
-  }
-
-  function handlePageChange(newPage) {
-    loadCases(newPage, submittedSearch, filters);
-  }
-
-  function handleClear() {
-    const empty = { tipo: "", tecnologia: "", categoria: "", laboratorio: "" };
-    setSearchInput("");
-    setSubmittedSearch("");
-    setFilters(empty);
-    loadCases(0, "", empty);
-  }
-
-  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
   function handleLogout() {
     showToast("Sesión cerrada correctamente", "success");
