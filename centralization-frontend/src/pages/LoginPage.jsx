@@ -64,6 +64,7 @@ export default function LoginPage() {
                   id="login-email"
                   type="email"
                   placeholder="admin@softgic.com"
+                  autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -79,6 +80,7 @@ export default function LoginPage() {
                   id="login-password"
                   type="password"
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
