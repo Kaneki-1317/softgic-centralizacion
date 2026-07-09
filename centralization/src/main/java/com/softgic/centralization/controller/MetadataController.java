@@ -3,6 +3,7 @@ package com.softgic.centralization.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +20,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.softgic.centralization.dto.CategoriaDTO;
+import com.softgic.centralization.dto.LaboratorioDTO;
+import com.softgic.centralization.dto.TecnologiaDTO;
+import com.softgic.centralization.dto.TipoCasoDTO;
 import com.softgic.centralization.model.Categoria;
 import com.softgic.centralization.model.Laboratorio;
 import com.softgic.centralization.model.Tecnologia;
-import com.softgic.centralization.model.TipoCaso;
 import com.softgic.centralization.repository.CasoRepository;
 import com.softgic.centralization.repository.CategoriaRepository;
 import com.softgic.centralization.repository.LaboratorioRepository;
@@ -57,26 +61,34 @@ public class MetadataController {
 
     @Cacheable("tipos-casos")
     @GetMapping("/tipos-casos")
-    public List<TipoCaso> obtenerTiposCasos() {
-        return tipoCasoRepository.findAll();
+    public List<TipoCasoDTO> obtenerTiposCasos() {
+        return tipoCasoRepository.findAll().stream()
+                .map(TipoCasoDTO::from)
+                .collect(Collectors.toList());
     }
 
     @Cacheable("tecnologias")
     @GetMapping("/tecnologias")
-    public List<Tecnologia> obtenerTecnologias() {
-        return tecnologiaRepository.findAll();
+    public List<TecnologiaDTO> obtenerTecnologias() {
+        return tecnologiaRepository.findAll().stream()
+                .map(TecnologiaDTO::from)
+                .collect(Collectors.toList());
     }
 
     @Cacheable("categorias")
     @GetMapping("/categorias")
-    public List<Categoria> obtenerCategorias() {
-        return categoriaRepository.findAll();
+    public List<CategoriaDTO> obtenerCategorias() {
+        return categoriaRepository.findAll().stream()
+                .map(CategoriaDTO::from)
+                .collect(Collectors.toList());
     }
 
     @Cacheable("laboratorios")
     @GetMapping("/laboratorios")
-    public List<Laboratorio> obtenerLaboratorios() {
-        return laboratorioRepository.findAll();
+    public List<LaboratorioDTO> obtenerLaboratorios() {
+        return laboratorioRepository.findAll().stream()
+                .map(LaboratorioDTO::from)
+                .collect(Collectors.toList());
     }
 
     // ── POST endpoints — protegidos, invalidan caché ───────────────────────────
@@ -97,7 +109,7 @@ public class MetadataController {
         nueva.setNombreTecnologia(nombre);
         Tecnologia guardada = tecnologiaRepository.save(nueva);
         log.info("Tecnología creada correctamente. ID: {}, nombre: '{}'", guardada.getId(), guardada.getNombreTecnologia());
-        return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
+        return ResponseEntity.status(HttpStatus.CREATED).body(TecnologiaDTO.from(guardada));
     }
 
     @CacheEvict(value = "categorias", allEntries = true)
@@ -116,7 +128,7 @@ public class MetadataController {
         nueva.setNombreCategoria(nombre);
         Categoria guardada = categoriaRepository.save(nueva);
         log.info("Categoría creada correctamente. ID: {}, nombre: '{}'", guardada.getId(), guardada.getNombreCategoria());
-        return ResponseEntity.status(HttpStatus.CREATED).body(guardada);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CategoriaDTO.from(guardada));
     }
 
     @CacheEvict(value = "laboratorios", allEntries = true)
@@ -135,7 +147,7 @@ public class MetadataController {
         nuevo.setNombreLaboratorio(nombre);
         Laboratorio guardado = laboratorioRepository.save(nuevo);
         log.info("Equipo/unidad creado correctamente. ID: {}, nombre: '{}'", guardado.getId(), guardado.getNombreLaboratorio());
-        return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(LaboratorioDTO.from(guardado));
     }
 
     // ── DELETE endpoints — protegidos, invalidan caché ─────────────────────────
