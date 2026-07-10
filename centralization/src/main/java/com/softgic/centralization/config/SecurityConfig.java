@@ -1,5 +1,6 @@
 package com.softgic.centralization.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,10 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html"
                 ).permitAll()
+                // Health check — público; solo expone estado UP/DOWN (ver
+                // management.endpoint.health.show-details=never), necesario
+                // para que un orquestador/balanceador pueda consultarlo sin JWT.
+                .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                 // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
             )
@@ -86,10 +91,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+        // .trim() por origen: "https://a.com, https://b.com" (espacio tras la
+        // coma) dejaría un origen que nunca haría match contra ningún Origin real.
+        config.setAllowedOrigins(
+                Arrays.stream(allowedOrigins.split(","))
+                        .map(String::trim)
+                        .filter(origin -> !origin.isBlank())
+                        .toList());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Filename"));
-        config.setExposedHeaders(List.of("Authorization"));
+        // El JWT viaja en el body de la respuesta de login (LoginResponseDTO),
+        // nunca en un header de respuesta — no hay nada que el frontend
+        // necesite leer vía JS, así que no se expone ningún header.
         config.setAllowCredentials(false);
         config.setMaxAge(3600L);
 

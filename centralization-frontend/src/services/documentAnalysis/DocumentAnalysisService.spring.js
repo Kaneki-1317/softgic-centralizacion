@@ -24,11 +24,17 @@ async function analyze(files, { onProgress } = {}) {
   onProgress?.(STAGE.PREPARING);
   onProgress?.(STAGE.PROCESSING);
 
+  // El backend solo acepta "application/pdf" u "application/octet-stream" en
+  // este endpoint (y valida el contenido real del archivo además del header).
+  // Enviamos el tipo real cuando sí es un PDF, y el genérico binario en
+  // cualquier otro caso — nunca afirmamos que un archivo es PDF si no lo es.
+  const contentType = file.type === "application/pdf" ? "application/pdf" : "application/octet-stream";
+
   let response;
   try {
     response = await api.post("/casos/analizar-documento", file, {
       headers: {
-        "Content-Type": "application/pdf",
+        "Content-Type": contentType,
         "X-Filename": encodeURIComponent(file.name),
       },
     });

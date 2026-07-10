@@ -2,9 +2,14 @@ package com.softgic.centralization.dto;
 
 import com.softgic.centralization.util.ValidResourceUrl;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class RecursoDTO {
 
+    @NotBlank(message = "El tipo de documento es obligatorio")
     private String tipo;   // PDF, PPT, XLSX, VIDEO, LINK
+
+    @NotBlank(message = "El nombre del documento es obligatorio")
     private String nombre;
 
     @ValidResourceUrl

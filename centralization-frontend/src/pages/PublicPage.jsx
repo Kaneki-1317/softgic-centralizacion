@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SearchX } from "lucide-react";
+import { SearchX, WifiOff, ServerCrash } from "lucide-react";
 
 import PublicNavbar from "../components/Navbar/PublicNavbar";
 import FilterPanel from "../components/Filters/FilterPanel";
@@ -17,6 +17,7 @@ export default function PublicPage() {
   const {
     cases,
     loading,
+    feedError,
     metadata,
     pagination,
     searchInput,
@@ -27,6 +28,7 @@ export default function PublicPage() {
     handleFilterChange,
     handlePageChange,
     handleClear,
+    reload,
   } = useCaseFeed({
     loadCasesErrorMessage: "Error al cargar los datos",
     loadMetadataErrorMessage: "Error al cargar los datos",
@@ -82,7 +84,29 @@ export default function PublicPage() {
         <section className="case-feed">
           {loading && <CaseSkeletons />}
 
-          {!loading && cases.length === 0 && (
+          {!loading && cases.length === 0 && feedError === "network" && (
+            <div className="empty-state">
+              <WifiOff size={52} strokeWidth={1.3} />
+              <h3>Sin conexión</h3>
+              <p>No pudimos conectarnos con el servidor. Verifica tu conexión a internet e intenta de nuevo.</p>
+              <button className="ghost-button" onClick={reload}>
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {!loading && cases.length === 0 && feedError === "server" && (
+            <div className="empty-state">
+              <ServerCrash size={52} strokeWidth={1.3} />
+              <h3>El servidor no está disponible</h3>
+              <p>Ocurrió un problema en el servidor y no pudimos cargar los casos. Intenta de nuevo en unos minutos.</p>
+              <button className="ghost-button" onClick={reload}>
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {!loading && cases.length === 0 && !feedError && (
             <div className="empty-state">
               <SearchX size={52} strokeWidth={1.3} />
               <h3>Sin resultados</h3>

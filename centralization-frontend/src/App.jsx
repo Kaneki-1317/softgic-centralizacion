@@ -12,6 +12,7 @@ import {
 const PublicPage = lazy(() => import("./pages/PublicPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 import {
   useAuth,
@@ -75,6 +76,8 @@ export default function App() {
               </PrivateRoute>
             }
           />
+
+          <Route path="*" element={<NotFoundPage />} />
 
         </Routes>
       </Suspense>

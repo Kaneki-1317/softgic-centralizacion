@@ -3,10 +3,14 @@ package com.softgic.centralization.security;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LoginRateLimiter {
+
+    private static final Logger log = LoggerFactory.getLogger(LoginRateLimiter.class);
 
     private static final int MAX_ATTEMPTS = 5;
     private static final long BLOCK_DURATION_MS = 15 * 60 * 1000L; // 15 minutos
@@ -34,6 +38,10 @@ public class LoginRateLimiter {
 
     public void recordFailure(String key) {
         if (failedAttempts.size() >= MAX_TRACKED_KEYS) {
+            // Este umbral solo se alcanza con intentos fallidos desde una
+            // cantidad enorme de IPs distintas — señal de un ataque
+            // distribuido, vale la pena que quede visible en el log.
+            log.warn("LoginRateLimiter alcanzó MAX_TRACKED_KEYS ({}) y reseteó su estado de intentos fallidos.", MAX_TRACKED_KEYS);
             failedAttempts.clear();
         }
 

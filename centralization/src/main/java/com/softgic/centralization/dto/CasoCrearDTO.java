@@ -3,6 +3,7 @@ package com.softgic.centralization.dto;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,8 @@ public class CasoCrearDTO {
 
     private String cliente;
 
+    @NotNull(message = "El año de implementación es obligatorio")
+    @Min(value = 1900, message = "El año de implementación no es válido")
     private Integer anioImplementacion;
 
     @NotBlank(message = "El beneficio principal no puede estar vacío")
@@ -31,6 +34,7 @@ public class CasoCrearDTO {
     private String resultados;
 
     @Valid
+    @Size(max = 50, message = "No se pueden adjuntar más de 50 documentos por caso")
     private List<RecursoDTO> recursos;
 
     @NotNull(message = "Debe seleccionar un tipo de caso")

@@ -1,9 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Trash2 } from "lucide-react";
 
 export default function ConfirmModal({ open, onConfirm, onCancel }) {
   const cancelButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleConfirm() {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await onConfirm();
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -52,8 +63,8 @@ export default function ConfirmModal({ open, onConfirm, onCancel }) {
           <button className="ghost-button" onClick={onCancel} ref={cancelButtonRef}>
             Cancelar
           </button>
-          <button className="danger-button" onClick={onConfirm}>
-            Sí, eliminar
+          <button className="danger-button" onClick={handleConfirm} disabled={deleting}>
+            {deleting ? "Eliminando..." : "Sí, eliminar"}
           </button>
         </div>
 

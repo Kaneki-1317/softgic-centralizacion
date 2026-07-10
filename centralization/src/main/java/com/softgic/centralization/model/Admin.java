@@ -1,5 +1,7 @@
 package com.softgic.centralization.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +23,10 @@ public class Admin {
     @Column(unique = true, nullable = false, length = 100)
     private String correo;
 
+    // Defensa en profundidad: hoy esta entidad nunca se serializa directamente
+    // (las respuestas usan DTOs, ver LoginResponseDTO), pero si en el futuro
+    // algún endpoint la devolviera por error, el hash nunca debe salir.
+    @JsonIgnore
     @Column(nullable = false, length = 255)
     private String contrasena;
 

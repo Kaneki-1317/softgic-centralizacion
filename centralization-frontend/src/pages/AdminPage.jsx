@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SearchX } from "lucide-react";
+import { SearchX, WifiOff, ServerCrash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import AdminNavbar from "../components/Navbar/AdminNavbar";
@@ -32,6 +32,7 @@ export default function AdminPage() {
   const {
     cases,
     loading,
+    feedError,
     metadata,
     setMetadata,
     pagination,
@@ -117,7 +118,7 @@ export default function AdminPage() {
   function handleLogout() {
     showToast("Sesión cerrada correctamente", "success");
     logout();
-    navigate("/login");
+    navigate("/softgic-access-portal/login");
   }
 
 
@@ -192,7 +193,25 @@ export default function AdminPage() {
         <section className="case-feed">
           {loading && <CaseSkeletons />}
 
-          {!loading && cases.length === 0 && (
+          {!loading && cases.length === 0 && feedError === "network" && (
+            <div className="empty-state">
+              <WifiOff size={52} strokeWidth={1.3} />
+              <h3>Sin conexión</h3>
+              <p>No pudimos conectarnos con el servidor. Verifica tu conexión a internet e intenta de nuevo.</p>
+              <button className="ghost-button" onClick={reload}>Reintentar</button>
+            </div>
+          )}
+
+          {!loading && cases.length === 0 && feedError === "server" && (
+            <div className="empty-state">
+              <ServerCrash size={52} strokeWidth={1.3} />
+              <h3>El servidor no está disponible</h3>
+              <p>Ocurrió un problema en el servidor y no pudimos cargar los casos. Intenta de nuevo en unos minutos.</p>
+              <button className="ghost-button" onClick={reload}>Reintentar</button>
+            </div>
+          )}
+
+          {!loading && cases.length === 0 && !feedError && (
             <div className="empty-state">
               <SearchX size={52} strokeWidth={1.3} />
               <h3>Sin resultados</h3>

@@ -23,6 +23,9 @@ export function useCaseFeed({
 
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
+  // null = sin error · "network" = no llegó respuesta (sin internet o
+  // servidor inalcanzable) · "server" = el backend respondió con error (5xx).
+  const [feedError, setFeedError] = useState(null);
 
   const [metadata, setMetadata] = useState({
     tipos: [], tecnologias: [], categorias: [], laboratorios: [], tiposCasos: [],
@@ -45,6 +48,7 @@ export function useCaseFeed({
   async function loadCases(page, search, activeFilters) {
     try {
       setLoading(true);
+      setFeedError(null);
       const params = { page, size: 10 };
       if (search) params.search = search;
       if (activeFilters?.tipo)        params.tipo        = activeFilters.tipo;
@@ -61,6 +65,11 @@ export function useCaseFeed({
       });
     } catch (error) {
       console.error(error);
+      // Con respuesta del servidor (aunque sea de error) lo tratamos como
+      // "backend con error"; sin respuesta, como falla de red/conexión —
+      // es la distinción más precisa que se puede hacer desde el navegador.
+      setFeedError(error.response ? "server" : "network");
+      setCases([]);
       showToast(loadCasesErrorMessage, "error");
     } finally {
       setLoading(false);
@@ -120,6 +129,7 @@ export function useCaseFeed({
   return {
     cases,
     loading,
+    feedError,
     metadata,
     setMetadata,
     pagination,

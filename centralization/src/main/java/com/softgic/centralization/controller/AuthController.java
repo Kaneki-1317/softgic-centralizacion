@@ -63,7 +63,7 @@ public class AuthController {
 
         if (adminOpt.isEmpty()) {
             rateLimiter.recordFailure(clientIp);
-            log.warn("Intento de inicio de sesión fallido: correo no registrado ('{}').", request.getCorreo());
+            log.warn("Intento de inicio de sesión fallido: correo no registrado ('{}').", sanitizeForLog(request.getCorreo()));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -115,5 +115,14 @@ public class AuthController {
             }
         }
         return request.getRemoteAddr();
+    }
+
+    /**
+     * El correo llega sin validar formato (solo @NotBlank/@Size) y se escribe
+     * tal cual en el log de intentos fallidos. Sin esto, un valor con \r\n
+     * permitiría inyectar líneas de log falsas (log forging).
+     */
+    private String sanitizeForLog(String value) {
+        return value == null ? "" : value.replaceAll("[\\r\\n]", "_");
     }
 }

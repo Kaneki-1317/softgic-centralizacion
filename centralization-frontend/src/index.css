@@ -1352,6 +1352,11 @@
   opacity: 0.88;
 }
 
+.danger-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* ── Case Form Modal ── */
 .form-title-input {
   border: none;

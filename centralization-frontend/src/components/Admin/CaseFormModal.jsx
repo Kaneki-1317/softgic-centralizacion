@@ -204,6 +204,8 @@ export default function CaseFormModal({
   const [localCats, setLocalCats] = useState([]);
   const [localLabs, setLocalLabs] = useState([]);
 
+  const [saving, setSaving] = useState(false);
+
   const [quickCreate, setQuickCreate] = useState({
     open: false, type: null, name: "", loading: false, error: "",
   });
@@ -316,8 +318,10 @@ export default function CaseFormModal({
 
   // ── Form submit ──────────────────────────────────────────────────────────────
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+    if (saving) return;
+
     const recursos = form.recursos
       .filter((d) => d.url?.trim())
       .map((d) => ({ tipo: d.tipo, nombre: d.nombre.trim() || d.tipo, url: d.url.trim() }));
@@ -331,20 +335,25 @@ export default function CaseFormModal({
       return;
     }
 
-    onSave({
-      titulo:             form.titulo,
-      sector:             form.sector,
-      cliente:            form.cliente || null,
-      anioImplementacion: form.anioImplementacion ? Number(form.anioImplementacion) : null,
-      beneficioPrincipal: form.beneficioPrincipal,
-      reto:               form.reto,
-      resultados:         form.resultados || null,
-      recursos:           recursos.length ? recursos : null,
-      idTipoCaso:         Number(form.idTipoCaso),
-      idsTecnologias:     form.idsTecnologias,
-      idsCategorias:      form.idsCategorias,
-      idsLaboratorios:    form.idsLaboratorios,
-    });
+    setSaving(true);
+    try {
+      await onSave({
+        titulo:             form.titulo,
+        sector:             form.sector,
+        cliente:            form.cliente || null,
+        anioImplementacion: form.anioImplementacion ? Number(form.anioImplementacion) : null,
+        beneficioPrincipal: form.beneficioPrincipal,
+        reto:               form.reto,
+        resultados:         form.resultados || null,
+        recursos:           recursos.length ? recursos : null,
+        idTipoCaso:         Number(form.idTipoCaso),
+        idsTecnologias:     form.idsTecnologias,
+        idsCategorias:      form.idsCategorias,
+        idsLaboratorios:    form.idsLaboratorios,
+      });
+    } finally {
+      setSaving(false);
+    }
   }
 
   function toggleId(field, id) {
@@ -770,8 +779,8 @@ export default function CaseFormModal({
 
             <div className="form-actions">
               <button type="button" className="ghost-button" onClick={onClose}>Cancelar</button>
-              <button type="submit" className="primary-button">
-                {initialData ? "Guardar cambios" : "Crear caso"}
+              <button type="submit" className="primary-button" disabled={saving}>
+                {saving ? "Guardando..." : (initialData ? "Guardar cambios" : "Crear caso")}
               </button>
             </div>
 

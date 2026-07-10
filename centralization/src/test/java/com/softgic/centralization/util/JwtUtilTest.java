@@ -10,8 +10,10 @@ import org.junit.jupiter.api.Test;
 
 class JwtUtilTest {
 
-    // Secret de 32 bytes codificado en Base64 — solo para tests
-    private static final String TEST_SECRET = "U29mdGdpY0NlbnRyYWxpemFjaW9uU2VjcmV0S2V5MjAyNDEy";
+    // Secret de 32 bytes codificado en Base64, generado al azar solo para
+    // este test — nunca debe coincidir con ningún secreto real de ningún
+    // entorno (ver .env.example / application-dev.properties para esos).
+    private static final String TEST_SECRET = "xVBBhMFZaAX4vJaonQ9pFdJJSyuCTjjdVWwEwzNSA3w=";
     private static final long EXPIRATION_24H = 86_400_000L;
 
     private JwtUtil jwtUtil;
