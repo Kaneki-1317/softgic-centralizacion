@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
+import { fetchCases } from "../services/casesApi";
+import { fetchTiposCasos, fetchTecnologias, fetchCategorias, fetchLaboratorios } from "../services/catalogApi";
 import { useToast } from "../context/ToastContext";
 
 const EMPTY_FILTERS = { tipo: "", tecnologia: "", categoria: "", laboratorio: "" };
@@ -56,12 +57,12 @@ export function useCaseFeed({
       if (activeFilters?.categoria)   params.categoria   = activeFilters.categoria;
       if (activeFilters?.laboratorio) params.laboratorio = activeFilters.laboratorio;
 
-      const response = await api.get("/casos", { params });
-      setCases(response.data.content);
+      const data = await fetchCases(params);
+      setCases(data.content);
       setPagination({
-        paginaActual:   response.data.paginaActual,
-        totalPaginas:   response.data.totalPaginas,
-        totalElementos: response.data.totalElementos,
+        paginaActual:   data.paginaActual,
+        totalPaginas:   data.totalPaginas,
+        totalElementos: data.totalElementos,
       });
     } catch (error) {
       console.error(error);
@@ -79,17 +80,17 @@ export function useCaseFeed({
   async function loadMetadata() {
     try {
       const [tipos, tecs, cats, labs] = await Promise.all([
-        api.get("/tipos-casos"),
-        api.get("/tecnologias"),
-        api.get("/categorias"),
-        api.get("/laboratorios"),
+        fetchTiposCasos(),
+        fetchTecnologias(),
+        fetchCategorias(),
+        fetchLaboratorios(),
       ]);
       setMetadata({
-        tipos:        tipos.data.map((t) => ({ id: t.id, label: t.nombreTipo })),
-        tecnologias:  tecs.data.map((t)  => ({ id: t.id, label: t.nombreTecnologia })),
-        categorias:   cats.data.map((c)  => ({ id: c.id, label: c.nombreCategoria })),
-        laboratorios: labs.data.map((l)  => ({ id: l.id, label: l.nombreLaboratorio })),
-        tiposCasos:   tipos.data,
+        tipos:        tipos.map((t) => ({ id: t.id, label: t.nombreTipo })),
+        tecnologias:  tecs.map((t)  => ({ id: t.id, label: t.nombreTecnologia })),
+        categorias:   cats.map((c)  => ({ id: c.id, label: c.nombreCategoria })),
+        laboratorios: labs.map((l)  => ({ id: l.id, label: l.nombreLaboratorio })),
+        tiposCasos:   tipos,
       });
     } catch (error) {
       console.error(error);

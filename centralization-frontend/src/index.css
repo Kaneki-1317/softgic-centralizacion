@@ -856,15 +856,6 @@
   min-height: 220px;
 }
 
-.skeleton-card .card-title-block h2,
-.skeleton-card .card-title-accent,
-.skeleton-card .type-pill,
-.skeleton-card .card-description,
-.skeleton-card .card-tags,
-.skeleton-card .card-action-btn {
-  visibility: hidden;
-}
-
 .skeleton-card::after {
   content: "";
   position: absolute;

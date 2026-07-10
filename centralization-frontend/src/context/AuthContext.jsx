@@ -4,7 +4,7 @@ import {
   useState,
 } from "react";
 
-import api from "../services/api";
+import { login as loginRequest } from "../services/authApi";
 
 const AuthContext = createContext();
 
@@ -37,12 +37,9 @@ export function AuthProvider({ children }) {
 
   async function login(email, password) {
     try {
-      const response = await api.post("/auth/login", {
-        correo: email,
-        contrasena: password,
-      });
+      const data = await loginRequest(email, password);
 
-      const token = response.data.token;
+      const token = data.token;
       localStorage.setItem("token", token);
       const name = getNameFromToken(token);
       setAdminName(name);

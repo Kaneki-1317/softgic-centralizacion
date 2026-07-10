@@ -10,11 +10,13 @@ import CaseFormModal from "../components/Admin/CaseFormModal";
 import NewCaseWizard from "../components/Admin/NewCaseWizard";
 import CaseSkeletons from "../components/Cases/CaseSkeletons";
 import ConfirmModal from "../components/Shared/ConfirmModal";
+import Pagination from "../components/Shared/Pagination";
+import ResultsCounter from "../components/Shared/ResultsCounter";
 
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { useCaseFeed } from "../hooks/useCaseFeed";
-import api from "../services/api";
+import { createCase, updateCase, deleteCase as deleteCaseRequest } from "../services/casesApi";
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -51,10 +53,10 @@ export default function AdminPage() {
     const isEditing = !!editingCase;
     try {
       if (isEditing) {
-        await api.put(`/casos/${editingCase.id}`, data);
+        await updateCase(editingCase.id, data);
         showToast("Caso actualizado correctamente", "success");
       } else {
-        await api.post("/casos", data);
+        await createCase(data);
         showToast("Caso creado correctamente", "success");
       }
       setOpenModal(false);
@@ -104,7 +106,7 @@ export default function AdminPage() {
 
   async function confirmDelete() {
     try {
-      await api.delete(`/casos/${confirmId}`);
+      await deleteCaseRequest(confirmId);
       showToast("Caso eliminado correctamente", "success");
       reload();
     } catch (error) {
@@ -183,11 +185,7 @@ export default function AdminPage() {
           onClear={handleClear}
         />
 
-        {!loading && (
-          <p className="results-counter">
-            {pagination.totalElementos} caso{pagination.totalElementos !== 1 ? "s" : ""} encontrado{pagination.totalElementos !== 1 ? "s" : ""}
-          </p>
-        )}
+        {!loading && <ResultsCounter total={pagination.totalElementos} />}
 
         {/* Grilla de casos */}
         <section className="case-feed">
@@ -234,27 +232,11 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              {pagination.totalPaginas > 1 && (
-                <div className="pagination">
-                  <button
-                    className="ghost-button"
-                    onClick={() => handlePageChange(pagination.paginaActual - 1)}
-                    disabled={pagination.paginaActual === 0}
-                  >
-                    Anterior
-                  </button>
-                  <span className="pagination-info">
-                    Página {pagination.paginaActual + 1} de {pagination.totalPaginas}
-                  </span>
-                  <button
-                    className="ghost-button"
-                    onClick={() => handlePageChange(pagination.paginaActual + 1)}
-                    disabled={pagination.paginaActual >= pagination.totalPaginas - 1}
-                  >
-                    Siguiente
-                  </button>
-                </div>
-              )}
+              <Pagination
+                paginaActual={pagination.paginaActual}
+                totalPaginas={pagination.totalPaginas}
+                onPageChange={handlePageChange}
+              />
             </>
           )}
         </section>

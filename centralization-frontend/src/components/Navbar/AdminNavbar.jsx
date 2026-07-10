@@ -1,18 +1,8 @@
 import brandSoftgic from "../../assets/Softgic_Logo_White-scaled.png";
-
-function parseJwt(token) {
-  try {
-    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(atob(base64));
-  } catch {
-    return null;
-  }
-}
+import { useAuth } from "../../context/AuthContext";
 
 export default function AdminNavbar() {
-  const token = localStorage.getItem("token");
-  const payload = parseJwt(token);
-  const adminName = payload?.name ?? "Administrador";
+  const { adminName } = useAuth();
 
   return (
     <header className="admin-navbar">
@@ -23,7 +13,7 @@ export default function AdminNavbar() {
 
         <div className="admin-greeting">
           <span className="admin-greeting-label">Bienvenido,</span>
-          <span className="admin-greeting-name">{adminName}</span>
+          <span className="admin-greeting-name">{adminName ?? "Administrador"}</span>
         </div>
       </div>
     </header>

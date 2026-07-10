@@ -7,6 +7,8 @@ import CaseCard from "../components/Cases/CaseCard";
 import CaseDetailModal from "../components/Cases/CaseDetailModal";
 import CaseSkeletons from "../components/Cases/CaseSkeletons";
 import Footer from "../components/Shared/Footer";
+import Pagination from "../components/Shared/Pagination";
+import ResultsCounter from "../components/Shared/ResultsCounter";
 
 import { useCaseFeed } from "../hooks/useCaseFeed";
 
@@ -75,11 +77,7 @@ export default function PublicPage() {
           onClear={handleClear}
         />
 
-        {!loading && (
-          <p className="results-counter">
-            {pagination.totalElementos} caso{pagination.totalElementos !== 1 ? "s" : ""} encontrado{pagination.totalElementos !== 1 ? "s" : ""}
-          </p>
-        )}
+        {!loading && <ResultsCounter total={pagination.totalElementos} />}
 
         <section className="case-feed">
           {loading && <CaseSkeletons />}
@@ -125,27 +123,11 @@ export default function PublicPage() {
                 ))}
               </div>
 
-              {pagination.totalPaginas > 1 && (
-                <div className="pagination">
-                  <button
-                    className="ghost-button"
-                    onClick={() => handlePageChange(pagination.paginaActual - 1)}
-                    disabled={pagination.paginaActual === 0}
-                  >
-                    Anterior
-                  </button>
-                  <span className="pagination-info">
-                    Página {pagination.paginaActual + 1} de {pagination.totalPaginas}
-                  </span>
-                  <button
-                    className="ghost-button"
-                    onClick={() => handlePageChange(pagination.paginaActual + 1)}
-                    disabled={pagination.paginaActual >= pagination.totalPaginas - 1}
-                  >
-                    Siguiente
-                  </button>
-                </div>
-              )}
+              <Pagination
+                paginaActual={pagination.paginaActual}
+                totalPaginas={pagination.totalPaginas}
+                onPageChange={handlePageChange}
+              />
             </>
           )}
         </section>
