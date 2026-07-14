@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -47,7 +48,13 @@ class CasoServiceImplTest {
     @Test
     @SuppressWarnings("unchecked")
     void listarCasosPaginados_sinCasos_debeRetornarPaginaVacia() {
-        Page<Caso> emptyPage = new PageImpl<>(List.of());
+        // PageImpl(List) construye un Page "unpaged" (tamaño de página = 0),
+        // y ese caso especial hace que getTotalPages() devuelva 1 en vez de
+        // 0. El repositorio real siempre recibe un Pageable paginado (ver
+        // CasoServiceImpl: PageRequest.of(page, size)), así que el mock debe
+        // reflejar eso para que el test represente el comportamiento real.
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Caso> emptyPage = new PageImpl<>(List.of(), pageable, 0);
         when(casoRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(emptyPage);
 

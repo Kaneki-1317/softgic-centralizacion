@@ -128,6 +128,14 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- @WebMvcTest/MockMvc autoconfiguration — módulo separado de
+		     spring-boot-starter-test en esta versión (Spring Boot lo extrajo
+		     junto con el resto de spring-boot-webmvc). -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
