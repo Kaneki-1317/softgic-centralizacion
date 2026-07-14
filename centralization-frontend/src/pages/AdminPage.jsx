@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { SearchX, WifiOff, ServerCrash } from "lucide-react";
+import { useEffect, useState } from "react";
+import { SearchX, WifiOff, ServerCrash, LayoutGrid, Table2, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import AdminNavbar from "../components/Navbar/AdminNavbar";
@@ -8,15 +8,21 @@ import CaseCard from "../components/Cases/CaseCard";
 import CaseDetailModal from "../components/Cases/CaseDetailModal";
 import CaseFormModal from "../components/Admin/CaseFormModal";
 import NewCaseWizard from "../components/Admin/NewCaseWizard";
+import CasesTable from "../components/Admin/CasesTable";
+import AdminPagination from "../components/Admin/AdminPagination";
+import BulkActionsBar from "../components/Admin/BulkActionsBar";
+import ActiveFilterChips from "../components/Admin/ActiveFilterChips";
 import CaseSkeletons from "../components/Cases/CaseSkeletons";
 import ConfirmModal from "../components/Shared/ConfirmModal";
-import Pagination from "../components/Shared/Pagination";
 import ResultsCounter from "../components/Shared/ResultsCounter";
 
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { useCaseFeed } from "../hooks/useCaseFeed";
 import { createCase, updateCase, deleteCase as deleteCaseRequest } from "../services/casesApi";
+
+const VIEW_MODE_STORAGE_KEY = "softgic-admin-view-mode";
+const SEARCH_DEBOUNCE_MS = 450;
 
 export default function AdminPage() {
   const navigate = useNavigate();
@@ -31,6 +37,31 @@ export default function AdminPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [prefillData, setPrefillData] = useState(null);
 
+  // Vista tipo tabla vs. grilla de tarjetas — preferencia recordada entre
+  // sesiones. Por defecto "grid" para no cambiar la experiencia actual de
+  // quien no elige explícitamente la tabla.
+  const [viewMode, setViewMode] = useState(() => {
+    try {
+      return localStorage.getItem(VIEW_MODE_STORAGE_KEY) || "grid";
+    } catch {
+      return "grid";
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
+    } catch {
+      // localStorage no disponible (modo privado, cuota) — la preferencia
+      // simplemente no persiste entre sesiones, no es crítico.
+    }
+  }, [viewMode]);
+
+  // Selección de filas para acciones masivas — solo tiene sentido en la
+  // vista tabla.
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
   const {
     cases,
     loading,
@@ -38,16 +69,40 @@ export default function AdminPage() {
     metadata,
     setMetadata,
     pagination,
+    pageSize,
     searchInput,
     setSearchInput,
+    submittedSearch,
     filters,
     activeFilterCount,
     handleSearchSubmit,
     handleFilterChange,
     handlePageChange,
+    handlePageSizeChange,
     handleClear,
     reload,
   } = useCaseFeed();
+
+  // Búsqueda avanzada: además del botón "Busca"/Enter (que siguen
+  // funcionando igual), busca automáticamente tras una pausa al escribir.
+  useEffect(() => {
+    if (searchInput === submittedSearch) return;
+    const timer = setTimeout(() => {
+      handleSearchSubmit();
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
+  // La selección de filas queda ligada a los casos visibles en este momento
+  // — al cambiar de página, filtro, tamaño de página o recargar, se limpia
+  // en vez de arrastrar ids que ya no están en pantalla. Ajuste de estado
+  // durante el render (no en un efecto): mismo patrón que AdminPagination.
+  const [syncedCases, setSyncedCases] = useState(cases);
+  if (cases !== syncedCases) {
+    setSyncedCases(cases);
+    if (selectedIds.size > 0) setSelectedIds(new Set());
+  }
 
   async function saveCase(data) {
     const isEditing = !!editingCase;
@@ -117,6 +172,57 @@ export default function AdminPage() {
     }
   }
 
+  function toggleSelectCase(id) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAllOnPage() {
+    setSelectedIds((prev) => {
+      const allSelected = cases.length > 0 && cases.every((c) => prev.has(c.id));
+      const next = new Set(prev);
+      if (allSelected) {
+        cases.forEach((c) => next.delete(c.id));
+      } else {
+        cases.forEach((c) => next.add(c.id));
+      }
+      return next;
+    });
+  }
+
+  // Sin endpoint de borrado masivo en el backend (solo DELETE /casos/{id}):
+  // una petición por caso seleccionado, en paralelo, con un resumen al final.
+  async function handleBulkDeleteConfirm() {
+    const ids = Array.from(selectedIds);
+    setBulkDeleting(true);
+    try {
+      const results = await Promise.allSettled(ids.map((id) => deleteCaseRequest(id)));
+      const failed = results.filter((r) => r.status === "rejected").length;
+      const succeeded = ids.length - failed;
+
+      if (succeeded > 0 && failed === 0) {
+        showToast(`${succeeded} caso${succeeded !== 1 ? "s" : ""} eliminado${succeeded !== 1 ? "s" : ""} correctamente`, "success");
+      } else if (succeeded > 0 && failed > 0) {
+        showToast(`${succeeded} eliminado${succeeded !== 1 ? "s" : ""}, ${failed} con error`, "error");
+      } else {
+        showToast("No se pudo eliminar los casos seleccionados", "error");
+      }
+
+      setSelectedIds(new Set());
+      reload();
+    } finally {
+      setBulkDeleting(false);
+      setBulkConfirmOpen(false);
+    }
+  }
+
+  function handleRemoveFilter(key) {
+    handleFilterChange({ ...filters, [key]: "" });
+  }
+
   function handleLogout() {
     showToast("Sesión cerrada correctamente", "success");
     logout();
@@ -134,6 +240,26 @@ export default function AdminPage() {
         <div className="admin-toolbar">
           <span className="admin-toolbar-label">Panel Administrativo</span>
           <div className="admin-toolbar-actions">
+            <div className="view-mode-toggle" role="group" aria-label="Tipo de vista">
+              <button
+                type="button"
+                className={`view-mode-btn ${viewMode === "grid" ? "active" : ""}`}
+                onClick={() => setViewMode("grid")}
+                aria-pressed={viewMode === "grid"}
+                title="Vista de tarjetas"
+              >
+                <LayoutGrid size={15} />
+              </button>
+              <button
+                type="button"
+                className={`view-mode-btn ${viewMode === "table" ? "active" : ""}`}
+                onClick={() => setViewMode("table")}
+                aria-pressed={viewMode === "table"}
+                title="Vista de tabla"
+              >
+                <Table2 size={15} />
+              </button>
+            </div>
             <button
               className="primary-button"
               onClick={() => setWizardOpen(true)}
@@ -160,20 +286,34 @@ export default function AdminPage() {
             )}
           </button>
           <div className="search-right">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Buscar por palabras clave..."
-              aria-label="Buscar por palabras clave"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
-            />
+            <div className="search-input-wrap">
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Buscar por palabras clave..."
+                aria-label="Buscar por palabras clave"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSearchSubmit(); }}
+              />
+              {searchInput && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearchInput("")}
+                  aria-label="Limpiar texto de búsqueda"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
             <button className="search-btn" onClick={handleSearchSubmit}>
               Busca
             </button>
           </div>
         </div>
+
+        <ActiveFilterChips filters={filters} onRemove={handleRemoveFilter} />
 
         {/* Drawer de filtros */}
         <FilterPanel
@@ -187,7 +327,7 @@ export default function AdminPage() {
 
         {!loading && <ResultsCounter total={pagination.totalElementos} />}
 
-        {/* Grilla de casos */}
+        {/* Grilla / tabla de casos */}
         <section className="case-feed">
           {loading && <CaseSkeletons />}
 
@@ -220,22 +360,44 @@ export default function AdminPage() {
 
           {!loading && cases.length > 0 && (
             <>
-              <div className="case-grid">
-                {cases.map((item) => (
-                  <CaseCard
-                    key={item.id}
-                    item={item}
-                    onOpen={() => setSelectedCase(item)}
+              {viewMode === "table" ? (
+                <>
+                  <BulkActionsBar
+                    count={selectedIds.size}
+                    onClear={() => setSelectedIds(new Set())}
+                    onDeleteSelected={() => setBulkConfirmOpen(true)}
+                  />
+                  <CasesTable
+                    cases={cases}
+                    onOpen={(item) => setSelectedCase(item)}
                     onEdit={(item) => { setEditingCase(item); setOpenModal(true); }}
                     onDelete={deleteCase}
+                    selectedIds={selectedIds}
+                    onToggleSelect={toggleSelectCase}
+                    onToggleSelectAll={toggleSelectAllOnPage}
                   />
-                ))}
-              </div>
+                </>
+              ) : (
+                <div className="case-grid">
+                  {cases.map((item) => (
+                    <CaseCard
+                      key={item.id}
+                      item={item}
+                      onOpen={() => setSelectedCase(item)}
+                      onEdit={(item) => { setEditingCase(item); setOpenModal(true); }}
+                      onDelete={deleteCase}
+                    />
+                  ))}
+                </div>
+              )}
 
-              <Pagination
+              <AdminPagination
                 paginaActual={pagination.paginaActual}
                 totalPaginas={pagination.totalPaginas}
+                totalElementos={pagination.totalElementos}
+                pageSize={pageSize}
                 onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
               />
             </>
           )}
@@ -247,6 +409,14 @@ export default function AdminPage() {
         open={confirmId !== null}
         onConfirm={confirmDelete}
         onCancel={() => setConfirmId(null)}
+      />
+
+      <ConfirmModal
+        open={bulkConfirmOpen}
+        title={`¿Eliminar ${selectedIds.size} caso${selectedIds.size !== 1 ? "s" : ""} seleccionado${selectedIds.size !== 1 ? "s" : ""}?`}
+        message="Esta acción no se puede deshacer."
+        onConfirm={handleBulkDeleteConfirm}
+        onCancel={() => !bulkDeleting && setBulkConfirmOpen(false)}
       />
 
       <CaseDetailModal

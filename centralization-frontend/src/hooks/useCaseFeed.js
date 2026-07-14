@@ -19,6 +19,11 @@ const EMPTY_FILTERS = { tipo: "", tecnologia: "", categoria: "", laboratorio: ""
 export function useCaseFeed({
   loadCasesErrorMessage = "Error al cargar los casos",
   loadMetadataErrorMessage = "Error al cargar la metadata",
+  // Mismo valor que ya se usaba hardcodeado — PublicPage no pasa este
+  // parámetro, así que su comportamiento no cambia. AdminPage sí lo usa
+  // para ofrecer un selector de tamaño de página (tope real: 100, el
+  // backend rechaza tamaños mayores).
+  initialPageSize = 10,
 } = {}) {
   const { showToast } = useToast();
 
@@ -27,6 +32,7 @@ export function useCaseFeed({
   // null = sin error · "network" = no llegó respuesta (sin internet o
   // servidor inalcanzable) · "server" = el backend respondió con error (5xx).
   const [feedError, setFeedError] = useState(null);
+  const [pageSize, setPageSize] = useState(initialPageSize);
 
   const [metadata, setMetadata] = useState({
     tipos: [], tecnologias: [], categorias: [], laboratorios: [], tiposCasos: [],
@@ -46,11 +52,11 @@ export function useCaseFeed({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function loadCases(page, search, activeFilters) {
+  async function loadCases(page, search, activeFilters, size = pageSize) {
     try {
       setLoading(true);
       setFeedError(null);
-      const params = { page, size: 10 };
+      const params = { page, size };
       if (search) params.search = search;
       if (activeFilters?.tipo)        params.tipo        = activeFilters.tipo;
       if (activeFilters?.tecnologia)  params.tecnologia  = activeFilters.tecnologia;
@@ -119,6 +125,14 @@ export function useCaseFeed({
     loadCases(0, "", EMPTY_FILTERS);
   }
 
+  // Cambiar el tamaño de página vuelve a la página 0 — la página actual bajo
+  // el tamaño anterior puede no existir bajo el nuevo (ej. página 8 de a 10
+  // no tiene sentido de a 100).
+  function handlePageSizeChange(newSize) {
+    setPageSize(newSize);
+    loadCases(0, submittedSearch, filters, newSize);
+  }
+
   // Re-consulta la página/búsqueda/filtros actuales — para usar después de
   // crear, editar o eliminar un caso, sin reiniciar la posición del usuario.
   function reload() {
@@ -134,13 +148,16 @@ export function useCaseFeed({
     metadata,
     setMetadata,
     pagination,
+    pageSize,
     searchInput,
     setSearchInput,
+    submittedSearch,
     filters,
     activeFilterCount,
     handleSearchSubmit,
     handleFilterChange,
     handlePageChange,
+    handlePageSizeChange,
     handleClear,
     reload,
   };

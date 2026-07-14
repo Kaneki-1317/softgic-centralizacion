@@ -2472,6 +2472,314 @@ body::-webkit-scrollbar-corner,
 }
 
 /* ════════════════════════════════
+   FASE 5 — Panel admin profesional (vista tabla, paginación avanzada,
+   búsqueda con clear, filtros activos, acciones masivas)
+   ════════════════════════════════ */
+
+/* ── Toggle de vista (tarjetas / tabla) ── */
+.view-mode-toggle {
+  display: flex;
+  border: 1.5px solid #0d2d6b;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.view-mode-btn {
+  background: none;
+  border: none;
+  color: #0d2d6b;
+  padding: 9px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.view-mode-btn + .view-mode-btn {
+  border-left: 1.5px solid #0d2d6b;
+}
+
+.view-mode-btn:hover {
+  background: #eef0f5;
+}
+
+.view-mode-btn.active {
+  background: #0d2d6b;
+  color: #ffffff;
+}
+
+/* ── Búsqueda con botón de limpiar ── */
+.search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrap .search-input {
+  padding-right: 34px;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 6px;
+  background: none;
+  border: none;
+  color: #717781;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+}
+
+.search-clear-btn:hover {
+  background: #eef0f5;
+  color: #1a1a2e;
+}
+
+/* ── Chips de filtros activos ── */
+.active-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.active-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef6f8;
+  color: #006883;
+  border: 1px solid #bfe3ec;
+  border-radius: 20px;
+  padding: 5px 6px 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.active-filter-chip button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 50%;
+}
+
+.active-filter-chip button:hover {
+  background: rgba(0, 104, 131, 0.14);
+}
+
+/* ── Vista tabla ── */
+.cases-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #eef0f5;
+  border-radius: 12px;
+}
+
+.cases-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 760px;
+}
+
+.cases-table thead {
+  background: #f7f8fa;
+}
+
+.cases-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: #4a4f57;
+  border-bottom: 1px solid #eef0f5;
+  white-space: nowrap;
+}
+
+.cases-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f2f3f6;
+  color: #1a1a2e;
+  vertical-align: middle;
+}
+
+.cases-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.cases-table tbody tr.selected {
+  background: #eef6f8;
+}
+
+.cases-table-title-cell {
+  font-weight: 600;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cases-table-checkbox-col {
+  width: 36px;
+}
+
+.cases-table-actions-col {
+  width: 110px;
+}
+
+.cases-table-sort-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: #4a4f57;
+}
+
+.cases-table-sort-icon-idle {
+  opacity: 0.35;
+}
+
+.cases-table-sort-btn:hover .cases-table-sort-icon-idle {
+  opacity: 0.7;
+}
+
+.cases-table-actions-cell {
+  display: flex;
+  gap: 6px;
+}
+
+.table-icon-btn {
+  background: none;
+  border: 1px solid #e2e5eb;
+  border-radius: 6px;
+  color: #4a4f57;
+  padding: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.table-icon-btn:hover {
+  background: #eef0f5;
+  border-color: #0d2d6b;
+  color: #0d2d6b;
+}
+
+.table-icon-btn-danger:hover {
+  background: #fdecea;
+  border-color: #d93025;
+  color: #d93025;
+}
+
+.cases-table-sort-note {
+  font-size: 12.5px;
+  color: #737373;
+  padding: 8px 4px 0;
+}
+
+/* ── Barra de acciones masivas ── */
+.bulk-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: #fff7ed;
+  border: 1px solid #ffd9ae;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+
+.bulk-actions-count {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #7a4a12;
+}
+
+.bulk-actions-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.bulk-actions-buttons .danger-button,
+.bulk-actions-buttons .ghost-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+/* ── Paginación admin ── */
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 0 4px;
+}
+
+.admin-page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #555;
+}
+
+.admin-page-size select {
+  border: 1.5px solid #e2e5eb;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 13.5px;
+  color: #1a1a2e;
+  background: #ffffff;
+}
+
+.admin-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-pagination-edge-btn {
+  padding: 9px 10px;
+}
+
+.admin-page-jump {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #555;
+}
+
+.admin-page-jump input {
+  width: 52px;
+  border: 1.5px solid #e2e5eb;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13.5px;
+  text-align: center;
+}
+
+/* ════════════════════════════════
    FOCO VISIBLE (accesibilidad — WCAG 2.4.7 / 2.4.11)
    Un solo color de anillo de foco, reutilizado de la marca (el mismo navy de
    ghost-button/drawer), verificado contra los 3 fondos reales de la app

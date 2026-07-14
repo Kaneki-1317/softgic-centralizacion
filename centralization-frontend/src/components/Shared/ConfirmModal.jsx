@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Trash2 } from "lucide-react";
 
-export default function ConfirmModal({ open, onConfirm, onCancel }) {
+export default function ConfirmModal({
+  open,
+  onConfirm,
+  onCancel,
+  title = "¿Eliminar este caso?",
+  message = "Esta acción no se puede deshacer.",
+}) {
   const cancelButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
   const [deleting, setDeleting] = useState(false);
@@ -56,8 +62,8 @@ export default function ConfirmModal({ open, onConfirm, onCancel }) {
           <Trash2 size={28} />
         </div>
 
-        <h3 id="confirm-modal-title">¿Eliminar este caso?</h3>
-        <p>Esta acción no se puede deshacer.</p>
+        <h3 id="confirm-modal-title">{title}</h3>
+        <p>{message}</p>
 
         <div className="confirm-actions">
           <button className="ghost-button" onClick={onCancel} ref={cancelButtonRef}>
