@@ -27,6 +27,15 @@
   font-size: 16px;
 }
 
+.social-links a,
+.social-links a:visited,
+.social-links a:hover,
+.social-links a:active,
+.social-links a:focus {
+  color: #ffffff;
+  text-decoration: none;
+}
+
 .gptw-badge {
   padding: 5px 14px;
   border-radius: 20px;

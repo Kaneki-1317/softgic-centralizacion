@@ -8,10 +8,10 @@ function PublicNavbar(){
 
             <div className="top-bar">
                 <div className="social-links">
-                    <FaFacebook />
-                    <FaInstagram />
-                    <FaLinkedin />
-                    <FaYoutube />
+                    <a href="https://www.facebook.com/softgic/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><FaFacebook /></a>
+                    <a href="https://www.linkedin.com/company/softgic" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
+                    <a href="https://www.instagram.com/softgic/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                    <a href="https://www.youtube.com/channel/UCEVZYSClb1886VZOoW4EKwA" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><FaYoutube /></a>
                 </div>
 
                 <div className="gptw-badge">
