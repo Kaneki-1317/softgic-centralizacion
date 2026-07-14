@@ -89,7 +89,7 @@ export default function DocumentUploadStep({ entries, onEntriesChange, onAnalyze
         <UploadCloud size={30} className="upload-dropzone-icon" />
         <p className="upload-dropzone-text">Arrastra tus archivos aquí o haz clic para seleccionarlos</p>
         <p className="upload-dropzone-hint">
-          PDF, Word, Excel, PowerPoint, TXT u OpenDocument · máx. {MAX_FILE_SIZE_LABEL} por archivo
+          Solo PDF · máx. {MAX_FILE_SIZE_LABEL} por archivo
         </p>
         <input
           ref={inputRef}
