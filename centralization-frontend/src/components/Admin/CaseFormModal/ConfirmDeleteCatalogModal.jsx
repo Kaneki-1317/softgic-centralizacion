@@ -1,11 +1,17 @@
-import { Trash2 } from "lucide-react";
+import { useRef } from "react";
+import { Loader2, Trash2 } from "lucide-react";
 import { DELETE_MESSAGES } from "./constants";
+import { useFocusTrap } from "../../../hooks/useFocusTrap";
 
 /**
  * Sub-modal de confirmación al eliminar un ítem de catálogo (tecnología,
  * categoría o laboratorio) desde el formulario de caso.
  */
 export default function ConfirmDeleteCatalogModal({ confirmDelete, onCancel, onConfirm }) {
+  const panelRef = useRef(null);
+
+  useFocusTrap(panelRef, confirmDelete.open);
+
   if (!confirmDelete.open) return null;
 
   return (
@@ -16,6 +22,7 @@ export default function ConfirmDeleteCatalogModal({ confirmDelete, onCancel, onC
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-delete-modal-title"
+        ref={panelRef}
       >
         <div className="confirm-icon">
           <Trash2 size={28} />
@@ -38,6 +45,7 @@ export default function ConfirmDeleteCatalogModal({ confirmDelete, onCancel, onC
             onClick={onConfirm}
             disabled={confirmDelete.loading}
           >
+            {confirmDelete.loading && <Loader2 size={14} className="spin" />}
             {confirmDelete.loading ? "Eliminando..." : "Eliminar"}
           </button>
         </div>

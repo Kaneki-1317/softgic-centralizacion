@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { AlertTriangle, Settings2, LayoutList, FlaskConical, Building2, CalendarCheck, ExternalLink, TrendingUp, FileText, Paperclip } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const DOC_META = {
   PDF:  { label: "PDF",        color: "#dc2626", bg: "#fef2f2" },
@@ -9,8 +10,11 @@ const DOC_META = {
 };
 
 export default function CaseDetailModal({ item, onClose }) {
+  const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
+
+  useFocusTrap(panelRef, !!item);
 
   useEffect(() => {
     if (!item) return;
@@ -46,6 +50,7 @@ export default function CaseDetailModal({ item, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="case-detail-modal-title"
+        ref={panelRef}
       >
 
         <button className="modal-close" onClick={onClose} aria-label="Cerrar" ref={closeButtonRef}>&#10005;</button>

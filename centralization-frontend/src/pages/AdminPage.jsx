@@ -246,6 +246,7 @@ export default function AdminPage() {
                 className={`view-mode-btn ${viewMode === "grid" ? "active" : ""}`}
                 onClick={() => setViewMode("grid")}
                 aria-pressed={viewMode === "grid"}
+                aria-label="Vista de tarjetas"
                 title="Vista de tarjetas"
               >
                 <LayoutGrid size={15} />
@@ -255,6 +256,7 @@ export default function AdminPage() {
                 className={`view-mode-btn ${viewMode === "table" ? "active" : ""}`}
                 onClick={() => setViewMode("table")}
                 aria-pressed={viewMode === "table"}
+                aria-label="Vista de tabla"
                 title="Vista de tabla"
               >
                 <Table2 size={15} />
@@ -329,7 +331,7 @@ export default function AdminPage() {
 
         {/* Grilla / tabla de casos */}
         <section className="case-feed">
-          {loading && <CaseSkeletons />}
+          {loading && <CaseSkeletons variant={viewMode} />}
 
           {!loading && cases.length === 0 && feedError === "network" && (
             <div className="empty-state">

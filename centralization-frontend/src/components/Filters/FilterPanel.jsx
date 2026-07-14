@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import SelectFilter from "./SelectFilter";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 export default function FilterPanel({
   open,
@@ -10,8 +11,11 @@ export default function FilterPanel({
   onClear,
 }) {
   const activeCount = Object.values(filters).filter(Boolean).length;
+  const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
+
+  useFocusTrap(panelRef, open);
 
   useEffect(() => {
     if (!open) return;
@@ -25,7 +29,8 @@ export default function FilterPanel({
   }, [open, onClose]);
 
   // Al abrir, mueve el foco al drawer y recuerda qué elemento lo abrió; al
-  // cerrar, devuelve el foco ahí — sin focus trap, solo estos dos momentos.
+  // cerrar, devuelve el foco ahí. El focus trap (useFocusTrap arriba) evita
+  // que Tab se escape hacia el contenido de fondo mientras está abierto.
   useEffect(() => {
     if (!open) return;
 
@@ -50,6 +55,7 @@ export default function FilterPanel({
         aria-modal={open}
         aria-labelledby="filter-drawer-title"
         inert={!open}
+        ref={panelRef}
       >
         <div className="drawer-header">
           <div className="drawer-header-left">

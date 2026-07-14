@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, LogIn } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -94,7 +94,7 @@ export default function LoginPage() {
           )}
 
           <button className="login-submit" type="submit" disabled={loading}>
-            <LogIn size={16} />
+            {loading ? <Loader2 size={16} className="spin" /> : <LogIn size={16} />}
             {loading ? "Ingresando..." : "Ingresar"}
           </button>
 

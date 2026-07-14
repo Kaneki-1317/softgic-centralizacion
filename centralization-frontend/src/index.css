@@ -274,6 +274,10 @@
   cursor: pointer;
   font-weight: 500;
   transition: background 0.2s, color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .ghost-button:hover {
@@ -295,6 +299,10 @@
   cursor: pointer;
   font-weight: 500;
   transition: opacity 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .primary-button:hover {
@@ -312,6 +320,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
+  animation: fade-up-in 0.25s ease;
 }
 
 /* ── Case card ── */
@@ -383,7 +392,9 @@
 
 .tag-pill {
   background: #fde0cc;
-  color: #b85c2a;
+  /* Antes #b85c2a: ~3.6:1 contra el fondo, no llega al 4.5:1 que exige WCAG
+     AA para texto normal. Mismo tono, más oscuro, sin cambiar la paleta. */
+  color: #954a20;
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 12px;
@@ -588,6 +599,18 @@
   color: #ffffff;
 }
 
+/* ── Entrada suave de overlays y paneles modales — reutilizada por todos
+   los modales (detalle, formulario, confirmación, crear rápido). ── */
+@keyframes overlay-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes panel-pop-in {
+  from { opacity: 0; transform: scale(0.97) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 /* ── Case Detail Modal ── */
 .modal-overlay {
   position: fixed;
@@ -598,6 +621,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+  animation: overlay-fade-in 0.18s ease;
 }
 
 .modal-panel {
@@ -612,6 +636,7 @@
   display: flex;
   flex-direction: column;
   font-family: 'Segoe UI', Inter, sans-serif;
+  animation: panel-pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-close {
@@ -851,22 +876,102 @@
 
 .skeleton-card {
   pointer-events: none;
-  position: relative;
-  overflow: hidden;
   min-height: 220px;
 }
 
-.skeleton-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
+.skeleton-block {
+  display: block;
+  border-radius: 6px;
   background: linear-gradient(90deg, #f0f2f5 25%, #e4e7ec 50%, #f0f2f5 75%);
   background-size: 600px 100%;
   animation: shimmer 1.4s infinite linear;
 }
 
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skeleton-pill {
+  width: 92px;
+  height: 22px;
+  border-radius: 20px;
+}
+
+.skeleton-pill-sm {
+  width: 58px;
+}
+
+.skeleton-title {
+  width: 88%;
+  height: 19px;
+}
+
+.skeleton-title-short {
+  width: 56%;
+}
+
+.skeleton-text {
+  width: 100%;
+  height: 13px;
+}
+
+.skeleton-text-short {
+  width: 68%;
+}
+
+.skeleton-text-xs {
+  width: 44%;
+  height: 12px;
+}
+
+.skeleton-tags-row {
+  margin-top: 2px;
+}
+
+.skeleton-tag {
+  width: 64px;
+  height: 22px;
+  border-radius: 20px;
+}
+
+/* Skeleton de la vista tabla — mismas celdas que CasesTable */
+.skeleton-table-row td {
+  padding: 14px 12px;
+}
+
+.skeleton-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.skeleton-actions {
+  width: 84px;
+  height: 22px;
+  border-radius: 6px;
+}
+
+/* Oculto visualmente, disponible para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ── Empty state ── */
+@keyframes fade-up-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -876,6 +981,7 @@
   padding: 72px 24px;
   text-align: center;
   color: #737373;
+  animation: fade-up-in 0.25s ease;
 }
 
 .empty-state svg {
@@ -1287,6 +1393,7 @@
   align-items: center;
   gap: 10px;
   text-align: center;
+  animation: panel-pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   font-family: 'Segoe UI', Inter, sans-serif;
 }
 
@@ -1337,6 +1444,10 @@
   cursor: pointer;
   transition: opacity 0.2s;
   font-family: 'Segoe UI', Inter, sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .danger-button:hover {
@@ -1868,6 +1979,7 @@ body::-webkit-scrollbar-corner,
   justify-content: center;
   z-index: 1200;
   padding: 16px;
+  animation: overlay-fade-in 0.18s ease;
 }
 
 .quick-create-panel {
@@ -1880,6 +1992,7 @@ body::-webkit-scrollbar-corner,
   display: flex;
   flex-direction: column;
   gap: 16px;
+  animation: panel-pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .quick-create-header {
@@ -2581,6 +2694,7 @@ body::-webkit-scrollbar-corner,
   overflow-x: auto;
   border: 1px solid #eef0f5;
   border-radius: 12px;
+  animation: fade-up-in 0.25s ease;
 }
 
 .cases-table {
@@ -2796,5 +2910,23 @@ textarea:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid #0d2d6b;
   outline-offset: 2px;
+}
+
+/* ════════════════════════════════
+   PREFERS-REDUCED-MOTION (accesibilidad — WCAG 2.3.3)
+   Quien activó esta preferencia del sistema operativo recibe todas las
+   transiciones/animaciones existentes (shimmer de skeletons, entrada de
+   modales, fade de estados, progreso de toasts, etc.) casi instantáneas en
+   vez de deshabilitarlas por completo — evita el "salto" de un cambio
+   abrupto sin layout previo, que puede ser tan desorientador como la
+   animación que se quiso evitar.
+   ════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

@@ -1,4 +1,4 @@
-import { Sparkles, Check } from "lucide-react";
+import { Sparkles, Check, Loader2 } from "lucide-react";
 
 /**
  * Card reutilizable para las secciones de selección múltiple del formulario
@@ -57,6 +57,7 @@ export default function SelectionCard({
                     disabled={isCreating}
                     title={`Crear "${label}"`}
                   >
+                    {isCreating && <Loader2 size={11} className="spin" />}
                     {isCreating ? "Creando..." : label}
                   </button>
                 );

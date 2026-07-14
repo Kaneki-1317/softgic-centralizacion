@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Settings2, LayoutList, FlaskConical, Tag, TrendingUp, Building2 } from "lucide-react";
+import { Settings2, LayoutList, FlaskConical, Tag, TrendingUp, Building2, Loader2 } from "lucide-react";
 
 import { createCatalogItem, deleteCatalogItem } from "../../../services/catalogApi";
 import { useToast } from "../../../context/ToastContext";
+import { useFocusTrap } from "../../../hooks/useFocusTrap";
 
 import CatalogSection from "./CatalogSection";
 import QuickCreateModal from "./QuickCreateModal";
@@ -88,12 +89,19 @@ export default function CaseFormModal({
     tecnologia: new Set(), categoria: new Set(), laboratorio: new Set(),
   });
 
+  const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
   // Compartida entre los 2 sub-modales (crear rápido / confirmar eliminar):
   // nunca están abiertos a la vez, así que un solo ref alcanza para recordar
   // qué elemento abrió el que esté visible en cada momento.
   const subModalTriggerRef = useRef(null);
+
+  // El trap del formulario principal se desactiva mientras un sub-modal está
+  // abierto — cada sub-modal atrapa el foco dentro de su propio panel (ver
+  // QuickCreateModal/ConfirmDeleteCatalogModal), y tener dos traps activos a
+  // la vez sobre el mismo evento de teclado competiría entre sí.
+  useFocusTrap(panelRef, open && !quickCreate.open && !confirmDelete.open);
 
   // Sync local lists whenever parent updates them
   useEffect(() => { setLocalTecs(tecnologias); }, [tecnologias]);
@@ -364,6 +372,7 @@ export default function CaseFormModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="case-form-modal-title"
+        ref={panelRef}
       >
 
         <button className="modal-close" onClick={onClose} aria-label="Cerrar" ref={closeButtonRef}>&#10005;</button>
@@ -521,6 +530,7 @@ export default function CaseFormModal({
             <div className="form-actions">
               <button type="button" className="ghost-button" onClick={onClose}>Cancelar</button>
               <button type="submit" className="primary-button" disabled={saving}>
+                {saving && <Loader2 size={14} className="spin" />}
                 {saving ? "Guardando..." : (initialData ? "Guardar cambios" : "Crear caso")}
               </button>
             </div>

@@ -1,11 +1,17 @@
-import { X } from "lucide-react";
+import { useRef } from "react";
+import { Loader2, X } from "lucide-react";
 import { QUICK_CONFIG } from "./constants";
+import { useFocusTrap } from "../../../hooks/useFocusTrap";
 
 /**
  * Sub-modal de creación rápida de un ítem de catálogo (tecnología, categoría
  * o laboratorio) sin salir del formulario de caso.
  */
 export default function QuickCreateModal({ quickCreate, onNameChange, onSubmit, onClose }) {
+  const panelRef = useRef(null);
+
+  useFocusTrap(panelRef, quickCreate.open);
+
   if (!quickCreate.open) return null;
 
   const config = QUICK_CONFIG[quickCreate.type];
@@ -18,6 +24,7 @@ export default function QuickCreateModal({ quickCreate, onNameChange, onSubmit, 
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-create-modal-title"
+        ref={panelRef}
       >
         <div className="quick-create-header">
           <h5 className="quick-create-title" id="quick-create-modal-title">{config.title}</h5>
@@ -45,6 +52,7 @@ export default function QuickCreateModal({ quickCreate, onNameChange, onSubmit, 
               Cancelar
             </button>
             <button type="submit" className="primary-button" disabled={quickCreate.loading}>
+              {quickCreate.loading && <Loader2 size={14} className="spin" />}
               {quickCreate.loading ? "Guardando..." : "Guardar"}
             </button>
           </div>

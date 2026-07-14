@@ -5,6 +5,7 @@ import AnalysisProgressStep from "./AnalysisProgressStep";
 import { documentAnalysisService, STAGE } from "../../services/documentAnalysis";
 import { inferTipoFromExtension } from "../../services/documentAnalysis/fileValidation";
 import { useToast } from "../../context/ToastContext";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const STEP = {
   CHOOSER: "chooser",
@@ -48,8 +49,13 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
   const [fileEntries, setFileEntries] = useState([]);
   const [analysisStage, setAnalysisStage] = useState(null);
   const cancelledRef = useRef(false);
+  const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
+
+  // El wizard solo se monta mientras está abierto (ver comentario de la
+  // función), así que el trap siempre está activo mientras exista.
+  useFocusTrap(panelRef, true);
 
   // Red de seguridad adicional a handleClose: si el componente se desmonta
   // por otra razón (p. ej. el padre navega fuera de AdminPage) mientras un
@@ -120,6 +126,7 @@ export default function NewCaseWizard({ onClose, onChooseManual, onComplete }) {
         role="dialog"
         aria-modal="true"
         aria-label="Nuevo Caso"
+        ref={panelRef}
       >
         <button className="modal-close" onClick={handleClose} aria-label="Cerrar" ref={closeButtonRef}>&#10005;</button>
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 export default function ConfirmModal({
   open,
@@ -8,9 +9,12 @@ export default function ConfirmModal({
   title = "¿Eliminar este caso?",
   message = "Esta acción no se puede deshacer.",
 }) {
+  const panelRef = useRef(null);
   const cancelButtonRef = useRef(null);
   const previouslyFocusedRef = useRef(null);
   const [deleting, setDeleting] = useState(false);
+
+  useFocusTrap(panelRef, open);
 
   async function handleConfirm() {
     if (deleting) return;
@@ -56,6 +60,7 @@ export default function ConfirmModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
+        ref={panelRef}
       >
 
         <div className="confirm-icon">
@@ -70,6 +75,7 @@ export default function ConfirmModal({
             Cancelar
           </button>
           <button className="danger-button" onClick={handleConfirm} disabled={deleting}>
+            {deleting && <Loader2 size={14} className="spin" />}
             {deleting ? "Eliminando..." : "Sí, eliminar"}
           </button>
         </div>
